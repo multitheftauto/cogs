@@ -2,26 +2,26 @@ msgid ""
 msgstr ""
 "Project-Id-Version: red-discordbot\n"
 "POT-Creation-Date: 2019-07-14 04:24+0000\n"
-"PO-Revision-Date: 2020-01-07 21:49\n"
+"PO-Revision-Date: 2020-01-07 21:48\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: Indonesian\n"
+"Language-Team: Serbian (Cyrillic)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: redgettext 3.1\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Crowdin-Project: red-discordbot\n"
-"X-Crowdin-Language: id\n"
+"X-Crowdin-Language: sr\n"
 "X-Crowdin-File: /warnings/locales/messages.pot\n"
-"Language: id_ID\n"
+"Language: sr_SP\n"
 
 #: redbot/cogs/warnings/helpers.py:70
 msgid "I could not find a command from that input!"
-msgstr "Aku tidak bisa menemukan perintah dari masukan itu!"
+msgstr ""
 
 #: redbot/cogs/warnings/helpers.py:77
 msgid "That command requires bot owner. I can't allow you to use that for an action"
-msgstr "Command itu membutuhkan ijin dari pemilik bot. Saya tidak dapat mengizinkan anda untuk menggunakannya"
+msgstr ""
 
 #: redbot/cogs/warnings/helpers.py:86
 msgid "Enter the command to be run when the user **exceeds the points for this action to occur.**\\n**If you do not wish to have a command run, enter** `none`.\\n\\nEnter it exactly as you would if you were actually trying to run the command, except don't put a prefix and use `{user}` in place of any user/member arguments\\n\\nWARNING: The command entered will be run without regard to checks or cooldowns. Commands requiring bot owner are not allowed for security reasons.\\n\\nPlease wait 15 seconds before entering your response."
