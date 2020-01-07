@@ -2,18 +2,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: red-discordbot\n"
 "POT-Creation-Date: 2019-07-14 04:24+0000\n"
-"PO-Revision-Date: 2020-01-07 21:48\n"
+"PO-Revision-Date: 2020-01-07 21:47\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: Dutch\n"
+"Language-Team: Afrikaans\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: redgettext 3.1\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Crowdin-Project: red-discordbot\n"
-"X-Crowdin-Language: nl\n"
+"X-Crowdin-Language: af\n"
 "X-Crowdin-File: /mod/locales/messages.pot\n"
-"Language: nl_NL\n"
+"Language: af_ZA\n"
 
 #: redbot/cogs/mod/converters.py:16
 msgid "{} doesn't look like a valid user ID."
@@ -90,7 +90,7 @@ msgstr ""
 
 #: redbot/cogs/mod/kickban.py:277
 msgid "I lack the permissions to do this."
-msgstr "Je hebt niet de permissie om dit uit te voeren."
+msgstr ""
 
 #: redbot/cogs/mod/kickban.py:283
 msgid "User {user_id} is already banned."
@@ -199,7 +199,7 @@ msgstr ""
 #: redbot/cogs/mod/mod.py:44
 #, docstring
 msgid "Moderation tools."
-msgstr "Moderatietools."
+msgstr ""
 
 #: redbot/cogs/mod/movetocore.py:54
 #, docstring
@@ -416,7 +416,7 @@ msgstr ""
 
 #: redbot/cogs/mod/names.py:70
 msgid "Done."
-msgstr "Klaar."
+msgstr ""
 
 #: redbot/cogs/mod/names.py:76
 #, docstring
@@ -465,7 +465,7 @@ msgstr ""
 
 #: redbot/cogs/mod/names.py:136
 msgid "Roles"
-msgstr "Rollen"
+msgstr ""
 
 #: redbot/cogs/mod/names.py:140
 msgid "Previous Names"
@@ -503,7 +503,7 @@ msgstr ""
 #: redbot/cogs/mod/settings.py:20
 #, docstring
 msgid "Manage server administration settings."
-msgstr "Beheer serverbeheerinstellingen."
+msgstr ""
 
 #: redbot/cogs/mod/settings.py:30
 msgid "Delete repeats: {num_repeats}\\n"
@@ -516,7 +516,7 @@ msgstr ""
 #: redbot/cogs/mod/settings.py:33 redbot/cogs/mod/settings.py:38
 #: redbot/cogs/mod/settings.py:41 redbot/cogs/mod/settings.py:49
 msgid "No"
-msgstr "Nee"
+msgstr ""
 
 #: redbot/cogs/mod/settings.py:35
 msgid "Ban mention spam: {num_mentions}\\n"
@@ -524,7 +524,7 @@ msgstr ""
 
 #: redbot/cogs/mod/settings.py:36
 msgid "{num} mentions"
-msgstr "{num} vermeldingen"
+msgstr ""
 
 #: redbot/cogs/mod/settings.py:40
 msgid "Respects hierarchy: {yes_or_no}\\n"
@@ -532,7 +532,7 @@ msgstr ""
 
 #: redbot/cogs/mod/settings.py:41 redbot/cogs/mod/settings.py:49
 msgid "Yes"
-msgstr "Ja"
+msgstr ""
 
 #: redbot/cogs/mod/settings.py:43
 msgid "Delete delay: {num_seconds}\\n"
@@ -540,11 +540,11 @@ msgstr ""
 
 #: redbot/cogs/mod/settings.py:44
 msgid "{num} seconds"
-msgstr "{num} seconden"
+msgstr ""
 
 #: redbot/cogs/mod/settings.py:46
 msgid "None"
-msgstr "Geen"
+msgstr ""
 
 #: redbot/cogs/mod/settings.py:48
 msgid "Reinvite on unban: {yes_or_no}\\n"
