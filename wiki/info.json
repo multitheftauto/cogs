@@ -1,0 +1,11 @@
+{
+    "author": ["Deihim007"],
+    "install_msg": "",
+    "name": "wiki",
+    "disabled": false,
+    "short": "",
+    "description": "MTA:SA Wiki Cog",
+    "tags": [],
+    "requirements": [],
+    "hidden": false
+}
