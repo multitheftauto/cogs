@@ -1,0 +1,11 @@
+{
+  "author": ["Deihim007"],
+  "install_msg": "",
+  "name": "stats",
+  "disabled": false,
+  "short": "Show MTA server stats",
+  "description": "Show stats about Multi Theft Auto servers",
+  "tags": [],
+  "requirements": [],
+  "hidden": false
+}
