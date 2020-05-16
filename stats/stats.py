@@ -9,6 +9,7 @@ class Stats(commands.Cog):
         """MTA:SA Stats!"""
         pass
     @stats.command()
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def online(self, ctx):
         """Shows MTA's online players count"""
         total = 0
