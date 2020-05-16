@@ -16,4 +16,4 @@ class Stats(commands.Cog):
         servers = fetch_data()
         for server in servers:
             total += server.playersCount
-        await ctx.channel.send("There are currently "+str(total)+" online!")
+        await ctx.channel.send("There are currently "+str(total)+" players online!")
