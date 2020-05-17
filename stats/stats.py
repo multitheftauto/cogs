@@ -1,7 +1,7 @@
 from redbot.core import commands, checks
 from .ase import MTAServerlist
 
-import aiohttp, asyncio, time
+import discord, aiohttp, asyncio, time
 
 class Stats(commands.Cog):
     """My custom cog"""
@@ -30,19 +30,17 @@ class Stats(commands.Cog):
             await ctx.channel.send("There are currently "+str(total)+" players online!")
 
     @stats.command()
-    @commands.cooldown(1, 60, commands.BucketType.user)
+    @commands.cooldown(1, 30, commands.BucketType.user)
     @commands.guild_only()
     async def top(self, ctx):
         """Shows the servers with most players."""
         async with ctx.typing():
-            top = ""
-            peak = 0
             async with aiohttp.ClientSession() as session:
                 async with session.get(self.url) as response:
                     ase = MTAServerlist()
                     await ase.parse(await response.read())
-            for server in ase.servers:
-                if peak < server.playersCount:
-                    peak = server["players"]
-                    top = server["name"]
-            await ctx.channel.send("`"+top+"` with "+str(peak)+" players!")
+            top = sorted(ase.servers, key=lambda k: k['players'], reverse=True)[:10]
+            embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Multi Theft Auto Top Servers")
+            for v in top:
+                embed.add_field(name="**"+v["name"]+"**", value=str(v["players"])+"/"+str(v["maxplayers"]), inline=False)
+            await ctx.channel.send(embed=embed)
