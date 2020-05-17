@@ -3,7 +3,7 @@ from redbot.core import commands, checks, data_manager
 from redbot.core.config import Config
 from redbot.core.utils import mod
 
-import requests
+import aiohttp, asyncio
 from bs4 import BeautifulSoup
 import re
 import json
@@ -47,19 +47,20 @@ class wiki(commands.Cog):
         return string
 
     async def fetch(self, ctx, target, part):
-        target = target[0].upper() + target[1:]
-        page = requests.get(self.url+target)
-        soup = BeautifulSoup(page.content, 'html.parser')
-        data_type = soup.find('meta', attrs={'name': 'headingclass'})
+        async with ctx.typing():
+            async with aiohttp.ClientSession() as session:
+                target = target[0].upper() + target[1:]
+                async with session.get(self.url+target) as response:
+                    soup = BeautifulSoup(await response.text(), 'html.parser')
+                    data_type = soup.find('meta', attrs={'name': 'headingclass'})
+                    if data_type:
+                        for v in self.types:
+                            if v == data_type["data-subcaption"]:
+                                return await self.respond(ctx, target, part, soup, data_type["data-subcaption"])
 
-        if data_type:
-            for v in self.types:
-                if v == data_type["data-subcaption"]:
-                    return await self.respond(ctx, target, part, soup, data_type["data-subcaption"])
-
-            return await ctx.channel.send("No result!")
-        else:
-            return await ctx.channel.send("No result!")
+                        return await ctx.channel.send("No result!")
+                    else:
+                        return await ctx.channel.send("No result!")
 
     def parse(self, obj):
         result = []
