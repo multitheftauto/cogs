@@ -1,0 +1,7 @@
+{
+    "author" : ["Deihim007"],
+    "install_msg" : "See Multi Theft Auto's cogs at https://github.com/multitheftauto/cogs.",
+    "name" : "mta-cogs",
+    "short" : "Multi Theft Auto cogs",
+    "description" : "Moderation tools, server management, and forked cogs"
+}
