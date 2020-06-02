@@ -1,7 +1,7 @@
 {
     "author": ["Deihim007"],
     "install_msg": "Users can now use !mod or !mods to request your attention. Don't forget to configure the feed setting!",
-    "name": "ModReq",
+    "name": "modreq",
     "disabled": false,
     "short": "Request for mod attention",
     "description": "Request for mod attention, sending messages to the feed channel",
