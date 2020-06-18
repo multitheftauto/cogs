@@ -47,20 +47,20 @@ class wiki(commands.Cog):
         return string
 
     async def fetch(self, ctx, target, part):
-        async with ctx.typing():
-            async with aiohttp.ClientSession() as session:
-                target = target[0].upper() + target[1:]
-                async with session.get(self.url+target) as response:
-                    soup = BeautifulSoup(await response.text(), 'html.parser')
-                    data_type = soup.find('meta', attrs={'name': 'headingclass'})
-                    if data_type:
-                        for v in self.types:
-                            if v == data_type["data-subcaption"]:
-                                return await self.respond(ctx, target, part, soup, data_type["data-subcaption"])
+        # async with ctx.typing():
+        async with aiohttp.ClientSession() as session:
+            target = target[0].upper() + target[1:]
+            async with session.get(self.url+target) as response:
+                soup = BeautifulSoup(await response.text(), 'html.parser')
+                data_type = soup.find('meta', attrs={'name': 'headingclass'})
+                if data_type:
+                    for v in self.types:
+                        if v == data_type["data-subcaption"]:
+                            return await self.respond(ctx, target, part, soup, data_type["data-subcaption"])
 
-                        return await ctx.channel.send("No result!")
-                    else:
-                        return await ctx.channel.send("No result!")
+                    return await ctx.channel.send("No result!")
+                else:
+                    return await ctx.channel.send("No result!")
 
     def parse(self, obj):
         result = []
@@ -249,6 +249,8 @@ class wiki(commands.Cog):
 
         while("" in ticks):
             ticks.remove("")
+
+        print(ticks)
 
         if ticks:
             matches = self.intersection(ticks, self.list)
