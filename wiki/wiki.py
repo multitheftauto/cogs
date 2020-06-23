@@ -250,8 +250,6 @@ class wiki(commands.Cog):
         while("" in ticks):
             ticks.remove("")
 
-        print(ticks)
-
         if ticks:
             matches = self.intersection(ticks, self.list)
             if matches:
