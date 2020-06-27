@@ -218,7 +218,7 @@ class wiki(commands.Cog):
     @commands.command()
     async def wiki(self, ctx, target, part=None):
         if target == "allow":
-            if not await mod.check_permissions(ctx, ['manage_messages']):
+            if not await ctx.bot.is_mod(ctx.author):
                 return
             channels = await self.config.guild(ctx.guild).channels()
             if ctx.channel.id in channels:
@@ -227,7 +227,7 @@ class wiki(commands.Cog):
             await self.config.guild(ctx.guild).channels.set(channels)
             await ctx.channel.send("Wiki is now allowed in this channel.")
         elif target == "deny":
-            if not await mod.check_permissions(ctx, ['manage_messages']):
+            if not await ctx.bot.is_mod(ctx.author):
                 return
             channels = await self.config.guild(ctx.guild).channels()
             if ctx.channel.id not in channels:
