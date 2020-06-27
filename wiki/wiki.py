@@ -21,11 +21,14 @@ class wiki(commands.Cog):
         )
         self.url = "https://wiki.multitheftauto.com/wiki/"
 
+        default_guild = {
+            "channels": []
+        }
+
+        self.config.register_guild(**default_guild)
+
         with open(data_manager.bundled_data_path(self) / "list.json", "r") as f:
             self.list = json.load(f)
-
-        with open(data_manager.bundled_data_path(self) / "channels.json", "r") as f:
-            self.channels = json.load(f)
 
         self.junk = [
             "[[{{{image}}}|link=]]"
@@ -217,22 +220,22 @@ class wiki(commands.Cog):
         if target == "allow":
             if not await mod.check_permissions(ctx, ['manage_messages']):
                 return
-            if ctx.channel.id in self.channels:
+            channels = await self.config.guild(ctx.guild).channels()
+            if ctx.channel.id in channels:
                 return await ctx.channel.send("Wiki is already allowed in this channel.")
-            self.channels.append(ctx.channel.id)
-            with open(data_manager.bundled_data_path(self) / "channels.json", 'w') as f:
-                json.dump(self.channels, f)
+            channels.append(ctx.channel.id)
+            await self.config.guild(ctx.guild).channels.set(channels)
             await ctx.channel.send("Wiki is now allowed in this channel.")
         elif target == "deny":
             if not await mod.check_permissions(ctx, ['manage_messages']):
                 return
-            if ctx.channel.id not in self.channels:
+            channels = await self.config.guild(ctx.guild).channels()
+            if ctx.channel.id not in channels:
                 return await ctx.channel.send("Wiki is not allowed in here already.")
-            self.channels.remove(ctx.channel.id)
-            with open(data_manager.bundled_data_path(self) / "channels.json", 'w') as f:
-                json.dump(self.channels, f)
+            channels.remove(ctx.channel.id)
+            await self.config.guild(ctx.guild).channels.set(channels)
             await ctx.channel.send("Wiki is no longer available in this channel.")
-        elif ctx.channel.id in self.channels:
+        elif ctx.channel.id in await self.config.guild(ctx.guild).channels():
             await self.fetch(ctx, target, part)
 
     @commands.Cog.listener()
@@ -242,7 +245,8 @@ class wiki(commands.Cog):
         guild = ctx.guild
         if guild is None:
             return
-        if ctx.channel.id not in self.channels:
+        channels = await self.config.guild(ctx.guild).channels()
+        if ctx.channel.id not in channels:
             return
 
         ticks = re.findall(r'\`(.*?)\`', ctx.content)
