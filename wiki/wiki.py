@@ -237,6 +237,8 @@ class wiki(commands.Cog):
             await ctx.channel.send("Wiki is no longer available in this channel.")
         elif ctx.channel.id in await self.config.guild(ctx.guild).channels():
             await self.fetch(ctx, target, part)
+        else:
+            await ctx.channel.send("Wiki command is not allowed in this channel.")
 
     @commands.Cog.listener()
     async def on_message_without_command(self, ctx):
