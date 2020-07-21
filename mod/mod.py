@@ -68,8 +68,8 @@ class Mod(ModClass):
         while True:
             tempbanned = await self.__config.tempbanned()
             for guildid in tempbanned:
-                for user in tempbanned[guildid]:
-                    if datetime.fromtimestamp(tempbanned[guildid][user]["expiry"]) < datetime.now():
+                for user_id in tempbanned[guildid]:
+                    if datetime.fromtimestamp(tempbanned[guildid][user_id]["expiry"]) < datetime.now():
                         guild = self.bot.get_guild(int(guildid))
                         if not guild:
                             return
@@ -77,7 +77,7 @@ class Mod(ModClass):
                         bans = [be.user for be in bans]
                         user = discord.utils.get(bans, id=user_id)
                         await guild.unban(user, reason="Expired temporary ban.")
-                        del tempbanned[guildid][user]
+                        del tempbanned[guildid][user_id]
             await asyncio.sleep(15)
 
     async def unmute(self, user, guildid, *, moderator: discord.Member = None):
