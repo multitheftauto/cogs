@@ -399,16 +399,17 @@ class Mod(ModClass):
             async with self.config.guild(guild).current_tempbans() as current_tempbans:
                 current_tempbans.append(user.id)
 
-            with contextlib.suppress(discord.HTTPException):
-                # We don't want blocked DMs preventing us from banning
-                msg = ("You have been temporarily banned from {server_name} until {date}.").format(
-                    server_name=guild.name, date=unban_time.strftime("%m-%d-%Y %H:%M:%S")
-                )
-                if invite:
-                    msg += (" Here is an invite for when your ban expires: {invite_link}").format(
-                        invite_link=invite
+            if guild.get_member(user_id):
+                with contextlib.suppress(discord.HTTPException):
+                    # We don't want blocked DMs preventing us from banning
+                    msg = ("You have been temporarily banned from {server_name} until {date}.").format(
+                        server_name=guild.name, date=unban_time.strftime("%m-%d-%Y %H:%M:%S")
                     )
-                await user.send(msg)
+                    if invite:
+                        msg += (" Here is an invite for when your ban expires: {invite_link}").format(
+                            invite_link=invite
+                        )
+                    await user.send(msg)
             try:
                 await guild.ban(user, reason=reason, delete_message_days=days)
             except discord.Forbidden:
