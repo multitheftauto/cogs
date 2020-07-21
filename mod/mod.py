@@ -35,7 +35,7 @@ class Mod(ModClass):
         self.__config.register_guild(**defaultsguild)
         self.__config.register_global(**defaults)
         self.loop = bot.loop.create_task(self.unmute_loop())
-        self.loop2 = bot.loop.create_task(self.unban_loop())
+        # self.loop2 = bot.loop.create_task(self.unban_loop())
 
     # Removes main mods mute commands.
     voice_mute = None
@@ -53,7 +53,7 @@ class Mod(ModClass):
 
     def cog_unload(self):
         self.loop.cancel()
-        self.loop2.cancel()
+        # self.loop2.cancel()
 
     async def unmute_loop(self):
         while True:
