@@ -247,7 +247,7 @@ class Mod(ModClass):
     async def ban(
         self,
         ctx: commands.Context,
-        user_id: str,
+        user_id: int,
         duration: Optional[commands.TimedeltaConverter] = None,
         days: Optional[int] = None,
         *,
