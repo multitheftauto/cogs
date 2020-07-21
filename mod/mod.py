@@ -248,15 +248,18 @@ class Mod(ModClass):
         self,
         ctx: commands.Context,
         user_id: str,
-        duration: Optional[commands.TimedeltaConverter] = timedelta(days=1),
+        duration: Optional[commands.TimedeltaConverter] = None,
         days: Optional[int] = None,
         *,
         reason: str = None,
     ):
-        """Temporarily ban a user from this server."""
+        """Ban a user from this server and optionally temporary or delete days of messages.
+        If days is not a number, it's treated as the first word of the reason.
+        Minimum 0 days, maximum 7. If not specified, defaultdays setting will be used instead."""
         guild = ctx.guild
         author = ctx.author
-        unban_time = datetime.utcnow() + duration
+        if duration:
+            unban_time = datetime.utcnow() + duration
 
         user = guild.get_member(user_id)
 
@@ -287,46 +290,59 @@ class Mod(ModClass):
         if days is None:
             days = await self.config.guild(guild).default_days()
 
-        if not (0 <= days <= 7):
-            await ctx.send(_("Invalid days. Must be between 0 and 7."))
-            return
-        invite = await self.get_invite_for_reinvite(ctx, int(duration.total_seconds() + 86400))
-        if invite is None:
-            invite = ""
+        if not unban_time:
+            if days is None:
+            days = await self.config.guild(guild).default_days()
 
-        queue_entry = (guild.id, user.id)
-        await self.config.member(user).banned_until.set(unban_time.timestamp())
-        async with self.config.guild(guild).current_tempbans() as current_tempbans:
-            current_tempbans.append(user.id)
-
-        with contextlib.suppress(discord.HTTPException):
-            # We don't want blocked DMs preventing us from banning
-            msg = _("You have been temporarily banned from {server_name} until {date}.").format(
-                server_name=guild.name, date=unban_time.strftime("%m-%d-%Y %H:%M:%S")
+            result = await self.ban_user(
+                user=user, ctx=ctx, days=days, reason=reason, create_modlog_case=True
             )
-            if invite:
-                msg += _(" Here is an invite for when your ban expires: {invite_link}").format(
-                    invite_link=invite
-                )
-            await user.send(msg)
-        try:
-            await guild.ban(user, reason=reason, delete_message_days=days)
-        except discord.Forbidden:
-            await ctx.send(_("I can't do that for some reason."))
-        except discord.HTTPException:
-            await ctx.send(_("Something went wrong while banning."))
+
+            if result is True:
+                await ctx.send(_("Done. It was about time."))
+            elif isinstance(result, str):
+                await ctx.send(result)
         else:
-            try:
-                await modlog.create_case(
-                    self.bot,
-                    guild,
-                    ctx.message.created_at,
-                    "tempban",
-                    user,
-                    author,
-                    reason,
-                    unban_time,
+            if not (0 <= days <= 7):
+                await ctx.send(_("Invalid days. Must be between 0 and 7."))
+                return
+            invite = await self.get_invite_for_reinvite(ctx, int(duration.total_seconds() + 86400))
+            if invite is None:
+                invite = ""
+
+            queue_entry = (guild.id, user.id)
+            await self.config.member(user).banned_until.set(unban_time.timestamp())
+            async with self.config.guild(guild).current_tempbans() as current_tempbans:
+                current_tempbans.append(user.id)
+
+            with contextlib.suppress(discord.HTTPException):
+                # We don't want blocked DMs preventing us from banning
+                msg = _("You have been temporarily banned from {server_name} until {date}.").format(
+                    server_name=guild.name, date=unban_time.strftime("%m-%d-%Y %H:%M:%S")
                 )
-            except RuntimeError as e:
-                await ctx.send(e)
-            await ctx.send(_("Done. Enough chaos for now."))
+                if invite:
+                    msg += _(" Here is an invite for when your ban expires: {invite_link}").format(
+                        invite_link=invite
+                    )
+                await user.send(msg)
+            try:
+                await guild.ban(user, reason=reason, delete_message_days=days)
+            except discord.Forbidden:
+                await ctx.send(_("I can't do that for some reason."))
+            except discord.HTTPException:
+                await ctx.send(_("Something went wrong while banning."))
+            else:
+                try:
+                    await modlog.create_case(
+                        self.bot,
+                        guild,
+                        ctx.message.created_at,
+                        "tempban",
+                        user,
+                        author,
+                        reason,
+                        unban_time,
+                    )
+                except RuntimeError as e:
+                    await ctx.send(e)
+                await ctx.send(_("Done. Enough chaos for now."))
