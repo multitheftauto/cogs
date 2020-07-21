@@ -8,7 +8,7 @@ from redbot.cogs.mod import Mod as ModClass
 from redbot.core import Config, checks, commands, modlog
 from redbot.core.commands.converter import TimedeltaConverter
 from redbot.core.utils.chat_formatting import humanize_list, humanize_timedelta, inline
-from redbot.core.utils.mod import is_allowed_by_hierarchy
+from redbot.core.utils.mod import is_allowed_by_hierarchy, get_audit_reason
 from redbot.core.utils.predicates import MessagePredicate
 
 log = logging.getLogger("red.flarecogs.mod")
