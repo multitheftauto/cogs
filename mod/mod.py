@@ -267,10 +267,6 @@ class Mod(ModClass):
             elif guild.me.top_role <= user.top_role or user == guild.owner:
                 await ctx.send(("I cannot do that due to discord hierarchy rules"))
                 return
-        elif guild.me.top_role <= user.top_role or user == guild.owner:
-            return _("I cannot do that due to discord hierarchy rules.")
-        elif not (0 <= days <= 7):
-            return _("Invalid days. Must be between 0 and 7.")
 
         toggle = await self.config.guild(guild).dm_on_kickban()
         if toggle:
