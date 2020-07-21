@@ -274,18 +274,19 @@ class Mod(ModClass):
                 ("I cannot let you do that. Self-harm is bad {}").format("\N{PENSIVE FACE}")
             )
             return
-        elif not await is_allowed_by_hierarchy(self.bot, self.config, guild, author, user):
-            await ctx.send(
-                (
-                    "I cannot let you do that. You are "
-                    "not higher than the user in the role "
-                    "hierarchy."
+        elif guild.get_member(user_id):
+            elif not await is_allowed_by_hierarchy(self.bot, self.config, guild, author, user):
+                await ctx.send(
+                    (
+                        "I cannot let you do that. You are "
+                        "not higher than the user in the role "
+                        "hierarchy."
+                    )
                 )
-            )
-            return
-        elif guild.me.top_role <= user.top_role or user == guild.owner:
-            await ctx.send(("I cannot do that due to discord hierarchy rules"))
-            return
+                return
+            elif guild.me.top_role <= user.top_role or user == guild.owner:
+                await ctx.send(("I cannot do that due to discord hierarchy rules"))
+                return
 
         if days is None:
             days = await self.config.guild(guild).default_days()
