@@ -35,7 +35,7 @@ class Mod(ModClass):
         self.__config.register_guild(**defaultsguild)
         self.__config.register_global(**defaults)
         self.loop = bot.loop.create_task(self.unmute_loop())
-        self.loop = bot.loop.create_task(self.unban_loop())
+        self.loop2 = bot.loop.create_task(self.unban_loop())
 
     # Removes main mods mute commands.
     voice_mute = None
@@ -53,6 +53,7 @@ class Mod(ModClass):
 
     def cog_unload(self):
         self.loop.cancel()
+        self.loop2.cancel()
 
     async def unmute_loop(self):
         while True:
@@ -457,31 +458,26 @@ class Mod(ModClass):
             for guild in tempbanned:
                 for user in tempbanned[guild]:
                     if datetime.fromtimestamp(tempbanned[guild][user]["expiry"]) < datetime.now():
-                        user = discord.utils.get(bans, id=user)
-                        if not user:
-                            async with self.__config.tempbanned() as tempbanned:
-                                del tempbanned[guild][user]
+                        try:
+                            await guild.unban(user, reason="Expired temporary ban.")
+                        except discord.HTTPException:
+                            del tempbanned[guild][user]
+                            return
                         else:
                             try:
-                                await guild.unban(user, reason="Expired temporary ban.")
-                            except discord.HTTPException:
-                                return
+                                await modlog.create_case(
+                                    self.bot,
+                                    guild,
+                                    datetime.utcnow(),
+                                    "unban",
+                                    user,
+                                    author,
+                                    "Expired temporary ban.",
+                                    until=None,
+                                    channel=None,
+                                )
+                            except RuntimeError as e:
+                                await ctx.send(e)
                             else:
-                                try:
-                                    await modlog.create_case(
-                                        self.bot,
-                                        guild,
-                                        datetime.utcnow(),
-                                        "unban",
-                                        user,
-                                        author,
-                                        "Expired temporary ban.",
-                                        until=None,
-                                        channel=None,
-                                    )
-                                except RuntimeError as e:
-                                    await ctx.send(e)
-                                else:
-                                    async with self.__config.tempbanned() as tempbanned:
-                                        del tempbanned[guild][user]
+                                del tempbanned[guild][user]
             await asyncio.sleep(15)
