@@ -71,6 +71,8 @@ class Mod(ModClass):
                 for user in tempbanned[guild]:
                     if datetime.fromtimestamp(tempbanned[guild][user]["expiry"]) < datetime.now():
                         _guild = self.bot.get_guild(int(guild))
+                        bans = await _guild.bans()
+                        bans = [be.user for be in bans]
                         _user = discord.utils.get(bans, id=user)
                         if _user:
                             await _guild.unban(_user, "Expired temporary ban.")
