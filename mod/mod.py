@@ -292,7 +292,7 @@ class Mod(ModClass):
 
         if not unban_time:
             if days is None:
-            days = await self.config.guild(guild).default_days()
+                days = await self.config.guild(guild).default_days()
 
             result = await self.ban_user(
                 user=user, ctx=ctx, days=days, reason=reason, create_modlog_case=True
