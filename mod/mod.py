@@ -265,18 +265,18 @@ class Mod(ModClass):
 
         if not user:
             await ctx.send(
-                _("User not found!")
+                ("User not found!")
             )
             return
 
         if author == user:
             await ctx.send(
-                _("I cannot let you do that. Self-harm is bad {}").format("\N{PENSIVE FACE}")
+                ("I cannot let you do that. Self-harm is bad {}").format("\N{PENSIVE FACE}")
             )
             return
         elif not await is_allowed_by_hierarchy(self.bot, self.config, guild, author, user):
             await ctx.send(
-                _(
+                (
                     "I cannot let you do that. You are "
                     "not higher than the user in the role "
                     "hierarchy."
@@ -284,7 +284,7 @@ class Mod(ModClass):
             )
             return
         elif guild.me.top_role <= user.top_role or user == guild.owner:
-            await ctx.send(_("I cannot do that due to discord hierarchy rules"))
+            await ctx.send(("I cannot do that due to discord hierarchy rules"))
             return
 
         if days is None:
@@ -299,12 +299,12 @@ class Mod(ModClass):
             )
 
             if result is True:
-                await ctx.send(_("Done. It was about time."))
+                await ctx.send(("Done. It was about time."))
             elif isinstance(result, str):
                 await ctx.send(result)
         else:
             if not (0 <= days <= 7):
-                await ctx.send(_("Invalid days. Must be between 0 and 7."))
+                await ctx.send(("Invalid days. Must be between 0 and 7."))
                 return
             invite = await self.get_invite_for_reinvite(ctx, int(duration.total_seconds() + 86400))
             if invite is None:
@@ -317,20 +317,20 @@ class Mod(ModClass):
 
             with contextlib.suppress(discord.HTTPException):
                 # We don't want blocked DMs preventing us from banning
-                msg = _("You have been temporarily banned from {server_name} until {date}.").format(
+                msg = ("You have been temporarily banned from {server_name} until {date}.").format(
                     server_name=guild.name, date=unban_time.strftime("%m-%d-%Y %H:%M:%S")
                 )
                 if invite:
-                    msg += _(" Here is an invite for when your ban expires: {invite_link}").format(
+                    msg += (" Here is an invite for when your ban expires: {invite_link}").format(
                         invite_link=invite
                     )
                 await user.send(msg)
             try:
                 await guild.ban(user, reason=reason, delete_message_days=days)
             except discord.Forbidden:
-                await ctx.send(_("I can't do that for some reason."))
+                await ctx.send(("I can't do that for some reason."))
             except discord.HTTPException:
-                await ctx.send(_("Something went wrong while banning."))
+                await ctx.send(("Something went wrong while banning."))
             else:
                 try:
                     await modlog.create_case(
@@ -345,4 +345,4 @@ class Mod(ModClass):
                     )
                 except RuntimeError as e:
                     await ctx.send(e)
-                await ctx.send(_("Done. Enough chaos for now."))
+                await ctx.send(("Done. Enough chaos for now."))
