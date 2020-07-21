@@ -43,6 +43,7 @@ class Mod(ModClass):
     unmute_voice = None
     unmute_channel = None
     unmute_guild = None
+    ban_user = None
     ban = None
     unban = None
     hackban = None
@@ -239,6 +240,92 @@ class Mod(ModClass):
             expiry = datetime.fromtimestamp(guildmuted[user]["expiry"]) - datetime.now()
             msg += f"{self.bot.get_user(int(user)).mention} is muted for {humanize_timedelta(timedelta=expiry)}\n"
         await ctx.maybe_send_embed(msg if msg else "Nobody is currently muted.")
+
+    async def ban_user(
+        self,
+        user: discord.Member,
+        ctx: commands.Context,
+        days: int = 0,
+        reason: str = None,
+        create_modlog_case=False,
+    ) -> Union[str, bool]:
+        author = ctx.author
+        guild = ctx.guild
+
+        if author == user:
+            return _("I cannot let you do that. Self-harm is bad {}").format("\N{PENSIVE FACE}")
+        elif guild.get_member(user.id):
+            if not await is_allowed_by_hierarchy(self.bot, self.config, guild, author, user):
+                await ctx.send(
+                    (
+                        "I cannot let you do that. You are "
+                        "not higher than the user in the role "
+                        "hierarchy."
+                    )
+                )
+                return
+            elif guild.me.top_role <= user.top_role or user == guild.owner:
+                await ctx.send(("I cannot do that due to discord hierarchy rules"))
+                return
+        elif guild.me.top_role <= user.top_role or user == guild.owner:
+            return _("I cannot do that due to discord hierarchy rules.")
+        elif not (0 <= days <= 7):
+            return _("Invalid days. Must be between 0 and 7.")
+
+        toggle = await self.config.guild(guild).dm_on_kickban()
+        if toggle:
+            with contextlib.suppress(discord.HTTPException):
+                em = discord.Embed(
+                    title=bold(_("You have been banned from {guild}.").format(guild=guild))
+                )
+                em.add_field(
+                    name=_("**Reason**"),
+                    value=reason if reason is not None else _("No reason was given."),
+                    inline=False,
+                )
+                await user.send(embed=em)
+
+        audit_reason = get_audit_reason(author, reason)
+
+        queue_entry = (guild.id, user.id)
+        try:
+            await guild.ban(user, reason=audit_reason, delete_message_days=days)
+            log.info(
+                "{}({}) banned {}({}), deleting {} days worth of messages.".format(
+                    author.name, author.id, user.name, user.id, str(days)
+                )
+            )
+        except discord.Forbidden:
+            return _("I'm not allowed to do that.")
+        except Exception as e:
+            log.exception(
+                "{}({}) attempted to kick {}({}), but an error occurred.".format(
+                    author.name, author.id, user.name, user.id
+                )
+            )
+            return _("An unexpected error occurred.")
+
+        if create_modlog_case:
+            try:
+                await modlog.create_case(
+                    self.bot,
+                    guild,
+                    ctx.message.created_at,
+                    "ban",
+                    user,
+                    author,
+                    reason,
+                    until=None,
+                    channel=None,
+                )
+            except RuntimeError as e:
+                return _(
+                    "The user was banned but an error occurred when trying to "
+                    "create the modlog entry: {reason}"
+                ).format(reason=e)
+
+        return True
+
 
     @commands.command()
     @commands.guild_only()
