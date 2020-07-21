@@ -275,7 +275,7 @@ class Mod(ModClass):
             )
             return
         elif guild.get_member(user_id):
-            elif not await is_allowed_by_hierarchy(self.bot, self.config, guild, author, user):
+            if not await is_allowed_by_hierarchy(self.bot, self.config, guild, author, user):
                 await ctx.send(
                     (
                         "I cannot let you do that. You are "
