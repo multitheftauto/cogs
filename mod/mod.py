@@ -45,7 +45,7 @@ class Mod(ModClass):
     unmute_guild = None
     ban_user = None
     ban = None
-    unban = None
+    # unban = None
     hackban = None
     tempban = None
     softban = None
