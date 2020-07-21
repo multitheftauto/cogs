@@ -35,6 +35,7 @@ class Mod(ModClass):
         self.__config.register_guild(**defaultsguild)
         self.__config.register_global(**defaults)
         self.loop = bot.loop.create_task(self.unmute_loop())
+        self.loop = bot.loop.create_task(self.unban_loop())
 
     # Removes main mods mute commands.
     voice_mute = None
@@ -437,8 +438,8 @@ class Mod(ModClass):
                 await ctx.send(("Done. Enough chaos for now."))
 
     @checks.mod_or_permissions(manage_roles=True)
-    @mute.command(name="blist")
-    async def _blist(self, ctx):
+    @commands.command(name="tbanlist")
+    async def _tbanlist(self, ctx):
         """List those who are temporary banned."""
         tempbanned = await self.__config.tempbanned()
         guildmuted = tempbanned.get(str(ctx.guild.id))
@@ -447,5 +448,43 @@ class Mod(ModClass):
         msg = ""
         for user in guildmuted:
             expiry = datetime.fromtimestamp(guildmuted[user]["expiry"]) - datetime.now()
-            msg += f"{self.bot.get_user(int(user)).mention} is muted for {humanize_timedelta(timedelta=expiry)}\n"
-        await ctx.maybe_send_embed(msg if msg else "Nobody is currently muted.")
+            msg += f"{self.bot.get_user(int(user)).mention} is banned for {humanize_timedelta(timedelta=expiry)}\n"
+        await ctx.maybe_send_embed(msg if msg else "Nobody is currently temporary banned.")
+
+    async def unban_loop(self):
+        while True:
+            tempbanned = await self.__config.tempbanned()
+            for guild in tempbanned:
+                for user in tempbanned[guild]:
+                    if datetime.fromtimestamp(tempbanned[guild][user]["expiry"]) < datetime.now():
+                        user = discord.utils.get(bans, id=user_id)
+                        if not user:
+                            async with self.__config.tempbanned() as tempbanned:
+                                del tempbanned[guild][user]
+                        else:
+
+                            audit_reason = get_audit_reason(ctx.author, reason)
+                            queue_entry = (guild.id, user_id)
+                            try:
+                                await guild.unban(user, reason=audit_reason)
+                            except discord.HTTPException:
+                                return
+                            else:
+                                try:
+                                    await modlog.create_case(
+                                        self.bot,
+                                        guild,
+                                        datetime.utcnow(),
+                                        "unban",
+                                        user,
+                                        author,
+                                        "Expired temporary ban.",
+                                        until=None,
+                                        channel=None,
+                                    )
+                                except RuntimeError as e:
+                                    await ctx.send(e)
+                                else:
+                                    async with self.__config.tempbanned() as tempbanned:
+                                        del tempbanned[guild][user]
+            await asyncio.sleep(15)
