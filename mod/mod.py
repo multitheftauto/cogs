@@ -64,6 +64,19 @@ class Mod(ModClass):
                         await self.unmute(user, guild)
             await asyncio.sleep(15)
 
+    async def unban_loop(self):
+        while True:
+            tempbanned = await self.__config.tempbanned()
+            for guild in tempbanned:
+                for user in tempbanned[guild]:
+                    if datetime.fromtimestamp(tempbanned[guild][user]["expiry"]) < datetime.now():
+                        _guild = self.bot.get_guild(int(guild))
+                        _user = discord.utils.get(bans, id=user)
+                        if _user:
+                            await _guild.unban(_user, "Expired temporary ban.")
+                        del tempbanned[guild][user]
+            await asyncio.sleep(15)
+
     async def unmute(self, user, guildid, *, moderator: discord.Member = None):
         guild = self.bot.get_guild(int(guildid))
         if guild is None:
@@ -451,33 +464,3 @@ class Mod(ModClass):
             expiry = datetime.fromtimestamp(guildmuted[user]["expiry"]) - datetime.now()
             msg += f"<@{user}> is banned for {humanize_timedelta(timedelta=expiry)}\n"
         await ctx.maybe_send_embed(msg if msg else "Nobody is currently temporary banned.")
-
-    async def unban_loop(self):
-        while True:
-            tempbanned = await self.__config.tempbanned()
-            for guild in tempbanned:
-                for user in tempbanned[guild]:
-                    if datetime.fromtimestamp(tempbanned[guild][user]["expiry"]) < datetime.now():
-                        try:
-                            await guild.unban(user, reason="Expired temporary ban.")
-                        except discord.HTTPException:
-                            del tempbanned[guild][user]
-                            return
-                        else:
-                            try:
-                                await modlog.create_case(
-                                    self.bot,
-                                    guild,
-                                    datetime.utcnow(),
-                                    "unban",
-                                    user,
-                                    author,
-                                    "Expired temporary ban.",
-                                    until=None,
-                                    channel=None,
-                                )
-                            except RuntimeError as e:
-                                await ctx.send(e)
-                            else:
-                                del tempbanned[guild][user]
-            await asyncio.sleep(15)
