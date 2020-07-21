@@ -35,7 +35,7 @@ class Mod(ModClass):
         self.__config.register_guild(**defaultsguild)
         self.__config.register_global(**defaults)
         self.loop = bot.loop.create_task(self.unmute_loop())
-        # self.loop2 = bot.loop.create_task(self.unban_loop())
+        self.loop2 = bot.loop.create_task(self.unban_loop())
 
     # Removes main mods mute commands.
     voice_mute = None
@@ -64,23 +64,20 @@ class Mod(ModClass):
                         await self.unmute(user, guild)
             await asyncio.sleep(15)
 
-    @commands.command()
-    @commands.guild_only()
-    @commands.bot_has_permissions(ban_members=True)
-    @checks.admin_or_permissions(ban_members=True)
-    async def bloop(self):
+    async def unban_loop(self):
         while True:
             tempbanned = await self.__config.tempbanned()
-            for guild in tempbanned:
-                for user in tempbanned[guild]:
-                    if datetime.fromtimestamp(tempbanned[guild][user]["expiry"]) < datetime.now():
-                        _guild = self.bot.get_guild(int(guild))
-                        bans = await _guild.bans()
+            for guildid in tempbanned:
+                for user in tempbanned[guildid]:
+                    if datetime.fromtimestamp(tempbanned[guildid][user]["expiry"]) < datetime.now():
+                        guild = self.bot.get_guild(int(guildid))
+                        if not guild:
+                            return
+                        bans = await guild.bans()
                         bans = [be.user for be in bans]
-                        _user = discord.utils.get(bans, id=user)
-                        if _user:
-                            await _guild.unban(_user, "Expired temporary ban.")
-                        del tempbanned[guild][user]
+                        user = discord.utils.get(bans, id=user_id)
+                        await guild.unban(user, reason="Expired temporary ban.")
+                        del tempbanned[guildid][user]
             await asyncio.sleep(15)
 
     async def unmute(self, user, guildid, *, moderator: discord.Member = None):
