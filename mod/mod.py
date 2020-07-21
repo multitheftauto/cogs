@@ -31,7 +31,7 @@ class Mod(ModClass):
             self, identifier=95932766180343808, force_registration=True
         )
         defaultsguild = {"muterole": None, "respect_hierarchy": True}
-        defaults = {"muted": {}}
+        defaults = {"muted": {}, "tempbanned": {}}
         self.__config.register_guild(**defaultsguild)
         self.__config.register_global(**defaults)
         self.loop = bot.loop.create_task(self.unmute_loop())
@@ -291,7 +291,7 @@ class Mod(ModClass):
         if days is None:
             days = await self.config.guild(guild).default_days()
 
-        if not unban_time:
+        if not duration:
             if days is None:
                 days = await self.config.guild(guild).default_days()
 
@@ -312,7 +312,7 @@ class Mod(ModClass):
                 invite = ""
 
             queue_entry = (guild.id, user.id)
-            await self.config.user.banned_until.set(unban_time.timestamp())
+            await self.config.member(user).banned_until.set(unban_time.timestamp())
             async with self.config.guild(guild).current_tempbans() as current_tempbans:
                 current_tempbans.append(user.id)
 
