@@ -397,7 +397,7 @@ class Mod(ModClass):
             async with self.__config.tempbanned() as tempbanned:
                 if str(ctx.guild.id) not in tempbanned:
                     tempbanned[str(ctx.guild.id)] = {}
-                expiry = datetime.now() + timedelta(seconds=duration_seconds)
+                expiry = datetime.now() + timedelta(seconds=duration.total_seconds())
                 tempbanned[str(ctx.guild.id)][str(user.id)] = {
                     "time": datetime.now().timestamp(),
                     "expiry": expiry.timestamp(),
