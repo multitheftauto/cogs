@@ -457,7 +457,7 @@ class Mod(ModClass):
             for guild in tempbanned:
                 for user in tempbanned[guild]:
                     if datetime.fromtimestamp(tempbanned[guild][user]["expiry"]) < datetime.now():
-                        user = discord.utils.get(bans, id=user_id)
+                        user = discord.utils.get(bans, id=user)
                         if not user:
                             async with self.__config.tempbanned() as tempbanned:
                                 del tempbanned[guild][user]
