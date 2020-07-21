@@ -341,8 +341,6 @@ class Mod(ModClass):
         Minimum 0 days, maximum 7. If not specified, defaultdays setting will be used instead."""
         guild = ctx.guild
         author = ctx.author
-        if duration:
-            unban_time = datetime.utcnow() + duration
 
         user = self.bot.get_user(user_id)
 
@@ -395,9 +393,15 @@ class Mod(ModClass):
                 invite = ""
 
             queue_entry = (guild.id, user.id)
-            await self.config.member(user).banned_until.set(unban_time.timestamp())
-            async with self.config.guild(guild).current_tempbans() as current_tempbans:
-                current_tempbans.append(user.id)
+            
+            async with self.__config.tempbanned() as tempbanned:
+                if str(ctx.guild.id) not in tempbanned:
+                    tempbanned[str(ctx.guild.id)] = {}
+                expiry = datetime.now() + timedelta(seconds=duration_seconds)
+                tempbanned[str(ctx.guild.id)][str(user.id)] = {
+                    "time": datetime.now().timestamp(),
+                    "expiry": expiry.timestamp(),
+                }
 
             if guild.get_member(user_id):
                 with contextlib.suppress(discord.HTTPException):
@@ -426,8 +430,22 @@ class Mod(ModClass):
                         user,
                         author,
                         reason,
-                        unban_time,
+                        datetime.utcnow() + duration,
                     )
                 except RuntimeError as e:
                     await ctx.send(e)
                 await ctx.send(("Done. Enough chaos for now."))
+
+    @checks.mod_or_permissions(manage_roles=True)
+    @mute.command(name="blist")
+    async def _blist(self, ctx):
+        """List those who are temporary banned."""
+        tempbanned = await self.__config.tempbanned()
+        guildmuted = tempbanned.get(str(ctx.guild.id))
+        if guildmuted is None:
+            return await ctx.send("There is currently nobody banned in {}".format(ctx.guild))
+        msg = ""
+        for user in guildmuted:
+            expiry = datetime.fromtimestamp(guildmuted[user]["expiry"]) - datetime.now()
+            msg += f"{self.bot.get_user(int(user)).mention} is muted for {humanize_timedelta(timedelta=expiry)}\n"
+        await ctx.maybe_send_embed(msg if msg else "Nobody is currently muted.")
