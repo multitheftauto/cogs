@@ -312,7 +312,7 @@ class Mod(ModClass):
                 invite = ""
 
             queue_entry = (guild.id, user.id)
-            await self.config.member(user).banned_until.set(unban_time.timestamp())
+            await self.config.user.banned_until.set(unban_time.timestamp())
             async with self.config.guild(guild).current_tempbans() as current_tempbans:
                 current_tempbans.append(user.id)
 
