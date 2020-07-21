@@ -261,10 +261,7 @@ class Mod(ModClass):
         if duration:
             unban_time = datetime.utcnow() + duration
 
-        user = guild.get_member(user_id)
-
-        if not user:
-            user = discord.Object(id=user_id)
+        user = self.bot.get_user(user_id)
 
         if not user:
             await ctx.send(
