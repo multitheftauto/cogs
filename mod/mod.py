@@ -264,6 +264,9 @@ class Mod(ModClass):
         user = guild.get_member(user_id)
 
         if not user:
+            user = discord.Object(id=user_id)
+
+        if not user:
             await ctx.send(
                 ("User not found!")
             )
