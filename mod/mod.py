@@ -240,7 +240,7 @@ class Mod(ModClass):
         msg = ""
         for user in guildmuted:
             expiry = datetime.fromtimestamp(guildmuted[user]["expiry"]) - datetime.now()
-            msg += f"{discord.Object(id=int(user)).mention} is muted for {humanize_timedelta(timedelta=expiry)}\n"
+            msg += f"{self.bot.get_user(int(user)).mention} is muted for {humanize_timedelta(timedelta=expiry)}\n"
         await ctx.maybe_send_embed(msg if msg else "Nobody is currently muted.")
 
     async def ban_user(
@@ -449,7 +449,7 @@ class Mod(ModClass):
         msg = ""
         for user in guildmuted:
             expiry = datetime.fromtimestamp(guildmuted[user]["expiry"]) - datetime.now()
-            msg += f"{discord.Object(id=int(user)).mention} is banned for {humanize_timedelta(timedelta=expiry)}\n"
+            msg += f"<@{user}> is banned for {humanize_timedelta(timedelta=expiry)}\n"
         await ctx.maybe_send_embed(msg if msg else "Nobody is currently temporary banned.")
 
     async def unban_loop(self):
