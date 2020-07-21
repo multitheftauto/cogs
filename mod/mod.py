@@ -462,11 +462,8 @@ class Mod(ModClass):
                             async with self.__config.tempbanned() as tempbanned:
                                 del tempbanned[guild][user]
                         else:
-
-                            audit_reason = get_audit_reason(ctx.author, reason)
-                            queue_entry = (guild.id, user_id)
                             try:
-                                await guild.unban(user, reason=audit_reason)
+                                await guild.unban(user, reason="Expired temporary ban.")
                             except discord.HTTPException:
                                 return
                             else:
