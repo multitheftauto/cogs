@@ -35,7 +35,7 @@ class Mod(ModClass):
         self.__config.register_guild(**defaultsguild)
         self.__config.register_global(**defaults)
         self.loop = bot.loop.create_task(self.unmute_loop())
-        self.loop2 = bot.loop.create_task(self.unban_loop())
+        # self.loop2 = bot.loop.create_task(self.unban_loop())
 
     # Removes main mods mute commands.
     voice_mute = None
@@ -64,7 +64,11 @@ class Mod(ModClass):
                         await self.unmute(user, guild)
             await asyncio.sleep(15)
 
-    async def unban_loop(self):
+    @commands.command()
+    @commands.guild_only()
+    @commands.bot_has_permissions(ban_members=True)
+    @checks.admin_or_permissions(ban_members=True)
+    async def bloop(self):
         while True:
             tempbanned = await self.__config.tempbanned()
             for guild in tempbanned:
