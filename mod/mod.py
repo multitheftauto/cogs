@@ -527,6 +527,9 @@ class Mod(ModClass):
             elif reason.find(target) != -1:
                 results.append(ban)
                 continue
+        
+        if not results:
+            return await ctx.send("No result!")
 
         rendered_results = [str(i+1)+"/"+str(len(results))+"\nUser: "+v.user.name+"("+str(v.user.id)+")\nReason: "+v.reason for i,v in enumerate(results)]
         await menu(ctx, rendered_results, DEFAULT_CONTROLS)
