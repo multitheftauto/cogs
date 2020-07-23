@@ -514,7 +514,10 @@ class Mod(ModClass):
         for ban in bans:
             user_id = str(ban.user.id).lower()
             name = ban.user.name.lower()
-            reason = ban.reason.lower()
+            if ban.reason:
+                reason = ban.reason.lower()
+            else:
+                reason = "None"
             if user_id.find(target) != -1:
                 results.append(ban)
                 continue
