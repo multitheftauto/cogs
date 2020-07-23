@@ -11,6 +11,7 @@ from redbot.core.commands.converter import TimedeltaConverter
 from redbot.core.utils.chat_formatting import humanize_list, humanize_timedelta, inline
 from redbot.core.utils.mod import is_allowed_by_hierarchy, get_audit_reason
 from redbot.core.utils.predicates import MessagePredicate
+from redbot.core.utils.menus import menu, DEFAULT_CONTROLS
 
 log = logging.getLogger("red.flarecogs.mod")
 
@@ -498,3 +499,31 @@ class Mod(ModClass):
             expiry = datetime.fromtimestamp(guildmuted[user]["expiry"]) - datetime.now()
             msg += f"<@{user}> is banned for {humanize_timedelta(timedelta=expiry)}\n"
         await ctx.maybe_send_embed(msg if msg else "Nobody is currently temporary banned.")
+
+    @checks.mod_or_permissions(manage_roles=True)
+    @commands.command()
+    async def searchban(self, ctx, target):
+        guild = ctx.guild
+        bans = await guild.bans()
+        target = target.lower()
+        if not bans:
+            return await ctx.send("There aren't any bans yet!")
+
+        results = []
+
+        for ban in bans:
+            user_id = str(ban.user.id).lower()
+            name = ban.user.name.lower()
+            reason = ban.reason.lower()
+            if user_id.find(target) != -1:
+                results.append(ban)
+                continue
+            elif name.find(target) != -1:
+                results.append(ban)
+                continue
+            elif reason.find(target) != -1:
+                results.append(ban)
+                continue
+
+        rendered_results = [str(i+1)+"/"+str(len(results))+"\nUser: "+v.user.name+"("+str(v.user.id)+")\nReason: "+v.reason for i,v in enumerate(results)]
+        await menu(ctx, rendered_results, DEFAULT_CONTROLS)
