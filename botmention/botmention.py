@@ -65,7 +65,7 @@ class BotMention(commands.Cog):
         if not channel_id:
             return
 
-        feed_channel = self.bot.get_channel(int(channel_id))
+        feed_channel = await self.bot.fetch_channel(int(channel_id))
         if not feed_channel:
             return
 
