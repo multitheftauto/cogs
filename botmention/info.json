@@ -1,0 +1,11 @@
+{
+  "author": ["Deihim007"],
+  "install_msg": "",
+  "name": "botmention",
+  "disabled": false,
+  "short": "",
+  "description": "Redirectes bot mentions to desired channel.",
+  "tags": [],
+  "requirements": [],
+  "hidden": false
+}
