@@ -127,6 +127,8 @@ class Forward(commands.Cog):
         # else:
         #     em.set_author(name=f"Message from {ctx.author} | {ctx.author.id}")
 
+        em.set_author(name=f"Message from MTA Staff")
+
         try:
             await user.send(embed=em)
         except discord.Forbidden:
