@@ -138,6 +138,6 @@ class Forward(commands.Cog):
             await ctx.send(
                 "Oops. I couldn't deliver your message to {}. They most likely have me blocked or DMs closed!".format(user)
             )
-        em = discord.Embed(colour=discord.Colour.green(), description="Message delivered to {}".format(user))
+        em = discord.Embed(colour=discord.Colour.green(), description="Message delivered to {}".format(user)+"\n"+message)
         em.set_footer(text=random_hash)
         await ctx.send(embed=em)
