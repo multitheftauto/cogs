@@ -1,5 +1,5 @@
 from redbot.core import commands, checks, Config
-import discord
+import discord, random
 
 
 class Forward(commands.Cog):
@@ -129,10 +129,15 @@ class Forward(commands.Cog):
 
         em.set_author(name=f"Message from MTA Staff")
 
+        random_hash = random.getrandbits(32)
+        em.set_footer(text=random_hash)
+
         try:
             await user.send(embed=em)
         except discord.Forbidden:
             await ctx.send(
                 "Oops. I couldn't deliver your message to {}. They most likely have me blocked or DMs closed!".format(user)
             )
-        await ctx.send("Message delivered to {}".format(user))
+        em = discord.Embed(colour=discord.Colour.green(), description="Message delivered to {}".format(user))
+        em.set_footer(text=random_hash)
+        await ctx.send(embed=em)
