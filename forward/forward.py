@@ -1,5 +1,5 @@
 from redbot.core import commands, checks, Config
-import discord, random
+import discord, uuid
 
 
 class Forward(commands.Cog):
@@ -129,7 +129,7 @@ class Forward(commands.Cog):
 
         em.set_author(name=f"Message from MTA Staff")
 
-        random_hash = random.getrandbits(32)
+        random_hash = uuid.uuid4().hex
         em.set_footer(text=random_hash)
 
         try:
