@@ -36,12 +36,10 @@ class BotMention(commands.Cog):
     @commands.Cog.listener("on_message_without_command")
     async def help_handler(self, message: discord.Message):
 
-        if self.mention_pattern is None:
-            self.mention_pattern = re.compile(rf"^<@!?{self.bot.user.id}>$")
 
-        if not self.mention_pattern.match(message.content):
+        if '<@!'+str(self.bot.user.id)+'>' not in message.content:
             return
-
+        
         channel = message.channel
         guild = message.guild
 
@@ -67,11 +65,11 @@ class BotMention(commands.Cog):
         if not channel_id:
             return
 
-        feed_channel = await self.bot.get_channel(int(channel_id))
+        feed_channel = self.bot.get_channel(int(channel_id))
         if not feed_channel:
             return
 
-        embed = discord.Embed(colour=discord.Colour(0xf5a623), description="<@"+str(message.author.id)+"> mentioned me in <#"+str(message.message.id)+"> ("+message.message.jump_url+")")
+        embed = discord.Embed(colour=discord.Colour(0xf5a623), description="<@"+str(message.author.id)+"> mentioned <@!"+str(self.bot.user.id)+"> in <#"+str(message.channel.id)+">\n**Message:**\n"+message.content+"\n[Go to message]("+message.jump_url+")")
         if not embed:
             return
         
