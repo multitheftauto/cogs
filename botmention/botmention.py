@@ -5,9 +5,9 @@ import discord
 from redbot.core import commands, Config, checks
 
 
-class MentionHelp(commands.Cog):
+class BotMention(commands.Cog):
     """
-    Provide help to people who mention the bot
+    Feed bot mentions
     """
 
     def __init__(self, bot):
