@@ -58,8 +58,8 @@ class BotMention(commands.Cog):
         bucket = self.cooldowns.get_bucket(message)
         current = message.created_at.replace(tzinfo=datetime.timezone.utc).timestamp()
 
-        if bucket.update_rate_limit(current):
-            return
+        # if bucket.update_rate_limit(current):
+        #     return
 
         channel_id = await self.__config.guild(message.guild).feed()
         if not channel_id:
