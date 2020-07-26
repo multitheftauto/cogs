@@ -16,7 +16,7 @@ class Forward(commands.Cog):
         self.bot = bot
 
         self.config = Config.get_conf(self, 1398467138476, force_registration=True)
-        default_global = {"toggles": {"botmessages": False}, "destination": None}
+        default_global = {"toggles": {"botmessages": False}, "destination": None, "reply": {}}
         self.config.register_global(**default_global)
 
     async def _destination(self, msg: str = None, embed: discord.Embed = None):
@@ -117,6 +117,46 @@ class Forward(commands.Cog):
         Separate version of [p]dm but allows for guild owners. This only works for users in the
         guild.
         """
+        em = discord.Embed(colour=discord.Colour.red(), description=message)
+
+        # if ctx.bot.user.avatar_url:
+        #     em.set_author(
+        #         name=f"Message from {ctx.author} | {ctx.author.id}",
+        #         icon_url=ctx.bot.user.avatar_url,
+        #     )
+        # else:
+        #     em.set_author(name=f"Message from {ctx.author} | {ctx.author.id}")
+
+        em.set_author(name=f"Message from MTA Staff")
+
+        random_hash = uuid.uuid4().hex
+        em.set_footer(text=random_hash)
+
+        try:
+            await user.send(embed=em)
+        except discord.Forbidden:
+            await ctx.send(
+                "Oops. I couldn't deliver your message to {}. They most likely have me blocked or DMs closed!".format(user)
+            )
+        em = discord.Embed(colour=discord.Colour.green(), description="Message delivered to {}".format(user)+"\n``"+message+"``")
+        em.set_footer(text="@"+ctx.author.name+"#"+ctx.author.discriminator+" | "+random_hash, icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=em)
+        async with self.__config.reply() as reply:
+            reply[ctx.author.id] = user.id
+
+    @commands.command(name="r")
+    @commands.guild_only()
+    @checks.guildowner()
+    async def replay(self, ctx, *, message: str):
+        """Reply your last pm recipient
+        """
+        async with self.__config.reply() as reply:
+            if reply[ctx.author.id]:
+                user_id = reply[ctx.author.id]
+                user = await self.bot.fetch_user(user_id)
+            else:
+                return await ctx.send("You have no recipient yet!")
+
         em = discord.Embed(colour=discord.Colour.red(), description=message)
 
         # if ctx.bot.user.avatar_url:
