@@ -141,7 +141,7 @@ class Forward(commands.Cog):
         em = discord.Embed(colour=discord.Colour.green(), description="Message delivered to {}".format(user)+"\n``"+message+"``")
         em.set_footer(text="@"+ctx.author.name+"#"+ctx.author.discriminator+" | "+random_hash, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
-        async with self.__config.reply() as reply:
+        async with self.config.reply() as reply:
             reply[ctx.author.id] = user.id
 
     @commands.command(name="r")
@@ -150,7 +150,7 @@ class Forward(commands.Cog):
     async def replay(self, ctx, *, message: str):
         """Reply your last pm recipient
         """
-        async with self.__config.reply() as reply:
+        async with self.config.reply() as reply:
             if reply[ctx.author.id]:
                 user_id = reply[ctx.author.id]
                 user = await self.bot.fetch_user(user_id)
