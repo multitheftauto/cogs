@@ -142,7 +142,7 @@ class Forward(commands.Cog):
         em.set_footer(text="@"+ctx.author.name+"#"+ctx.author.discriminator+" | "+random_hash, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
         async with self.config.reply() as reply:
-            reply[ctx.author.id] = user.id
+            reply[str(ctx.author.id)] = user.id
 
     @commands.command(name="r")
     @commands.guild_only()
@@ -151,10 +151,10 @@ class Forward(commands.Cog):
         """Reply your last pm recipient
         """
         reply = await self.config.reply()
-        if reply[ctx.author.id] is None:
+        if reply[str(ctx.author.id)] is None:
             return await ctx.send("You have no recipient yet!")
-            
-        user_id = reply[ctx.author.id]
+
+        user_id = reply[str(ctx.author.id)]
         user = await self.bot.fetch_user(user_id)
             
 
