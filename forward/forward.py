@@ -151,7 +151,7 @@ class Forward(commands.Cog):
         """Reply your last pm recipient
         """
         async with self.config.reply() as reply:
-            if reply[ctx.author.id]:
+            if reply[ctx.author.id] != None:
                 user_id = reply[ctx.author.id]
                 user = await self.bot.fetch_user(user_id)
             else:
