@@ -150,12 +150,12 @@ class Forward(commands.Cog):
     async def replay(self, ctx, *, message: str):
         """Reply your last pm recipient
         """
-        async with self.config.reply() as reply:
-            if reply[ctx.author.id] != None:
-                user_id = reply[ctx.author.id]
-                user = await self.bot.fetch_user(user_id)
-            else:
-                return await ctx.send("You have no recipient yet!")
+        reply = await self.config.reply()
+        if reply[ctx.author.id]:
+            user_id = reply[ctx.author.id]
+            user = await self.bot.fetch_user(user_id)
+        else:
+            return await ctx.send("You have no recipient yet!")
 
         em = discord.Embed(colour=discord.Colour.red(), description=message)
 
