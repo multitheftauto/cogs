@@ -151,11 +151,12 @@ class Forward(commands.Cog):
         """Reply your last pm recipient
         """
         reply = await self.config.reply()
-        if reply[ctx.author.id]:
-            user_id = reply[ctx.author.id]
-            user = await self.bot.fetch_user(user_id)
-        else:
+        if reply[ctx.author.id] is None:
             return await ctx.send("You have no recipient yet!")
+            
+        user_id = reply[ctx.author.id]
+        user = await self.bot.fetch_user(user_id)
+            
 
         em = discord.Embed(colour=discord.Colour.red(), description=message)
 
