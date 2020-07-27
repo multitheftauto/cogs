@@ -360,9 +360,7 @@ class Mod(ModClass):
                     channel=None,
                 )
             except RuntimeError as e:
-                return 
-                    "The user was banned but an error occurred when trying to "
-                    "create the modlog entry: {reason}".format(reason=e)
+                return "The user was banned but an error occurred when trying to create the modlog entry: {reason}".format(reason=e)
 
         return True
 
