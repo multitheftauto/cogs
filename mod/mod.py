@@ -372,7 +372,7 @@ class Mod(ModClass):
     async def ban(
         self,
         ctx: commands.Context,
-        user_id: int,
+        user: discord.Member,
         duration: Optional[commands.TimedeltaConverter] = None,
         purge_days: Optional[int] = None,
         *,
@@ -385,9 +385,9 @@ class Mod(ModClass):
         author = ctx.author
         days = purge_days
 
-        user = guild.get_member(user_id)
-        if not user:
-            user = await self.bot.fetch_user(user_id)
+        # user = guild.get_member(user_id)
+        # if not user:
+        #     user = await self.bot.fetch_user(user_id)
 
         if not user:
             await ctx.send(
@@ -400,7 +400,7 @@ class Mod(ModClass):
                 ("I cannot let you do that. Self-harm is bad {}").format("\N{PENSIVE FACE}")
             )
             return
-        elif guild.get_member(user_id):
+        elif guild.get_member(user.id):
             if not await is_allowed_by_hierarchy(self.bot, self.config, guild, author, user):
                 await ctx.send(
                     (
@@ -450,7 +450,7 @@ class Mod(ModClass):
 
             unban_time = datetime.utcnow() + duration
 
-            if guild.get_member(user_id):
+            if guild.get_member(user.id):
                 with contextlib.suppress(discord.HTTPException):
                     # We don't want blocked DMs preventing us from banning
                     msg = ("You have been temporarily banned from {server_name} until {date}.").format(
