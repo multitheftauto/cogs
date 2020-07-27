@@ -298,7 +298,7 @@ class Mod(ModClass):
         guild = ctx.guild
 
         if author == user:
-            return _("I cannot let you do that. Self-harm is bad {}").format("\N{PENSIVE FACE}")
+            return "I cannot let you do that. Self-harm is bad {}".format("\N{PENSIVE FACE}")
         elif guild.get_member(user.id):
             if not await is_allowed_by_hierarchy(self.bot, self.config, guild, author, user):
                 await ctx.send(
@@ -317,11 +317,11 @@ class Mod(ModClass):
             if toggle:
                 with contextlib.suppress(discord.HTTPException):
                     em = discord.Embed(
-                        title=bold(_("You have been banned from {guild}.").format(guild=guild))
+                        title="You have been banned from {guild}.".format(guild=guild)
                     )
                     em.add_field(
-                        name=_("**Reason**"),
-                        value=reason if reason is not None else _("No reason was given."),
+                        name="**Reason**",
+                        value=reason if reason is not None else "No reason was given.",
                         inline=False,
                     )
                     await user.send(embed=em)
@@ -337,14 +337,14 @@ class Mod(ModClass):
                 )
             )
         except discord.Forbidden:
-            return _("I'm not allowed to do that.")
+            return "I'm not allowed to do that."
         except Exception as e:
             log.exception(
                 "{}({}) attempted to kick {}({}), but an error occurred.".format(
                     author.name, author.id, user.name, user.id
                 )
             )
-            return _("An unexpected error occurred.")
+            return "An unexpected error occurred."
 
         if create_modlog_case:
             try:
@@ -360,10 +360,9 @@ class Mod(ModClass):
                     channel=None,
                 )
             except RuntimeError as e:
-                return _(
+                return 
                     "The user was banned but an error occurred when trying to "
-                    "create the modlog entry: {reason}"
-                ).format(reason=e)
+                    "create the modlog entry: {reason}".format(reason=e)
 
         return True
 
