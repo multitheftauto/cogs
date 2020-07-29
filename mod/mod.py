@@ -535,8 +535,8 @@ class Mod(ModClass):
 
     @commands.guild_only()
     @checks.mod_or_permissions(manage_roles=True)
-    @commands.command(aliases=["t"])
-    async def translate(self, ctx, *, message: Union[discord.Message, str]):
+    @commands.command(name="t")
+    async def _translate(self, ctx, *, message: Union[discord.Message, str]):
         if type(message) == str:
             translated = trans.translate(message)
             em = discord.Embed(colour=discord.Colour.green(), description="\n**Translation:**\n"+translated.text+"")
