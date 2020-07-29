@@ -6,6 +6,6 @@
   "short": "Custom moderation cog for MTA:SA discord",
   "description": "Timed ban/mute",
   "tags": [],
-  "requirements": [],
+  "requirements": ["googletrans"],
   "hidden": false
 }

@@ -1,8 +1,10 @@
 import asyncio
 import logging
 import contextlib
+import re
 from datetime import datetime, timedelta
 from typing import Optional, Union
+from googletrans import Translator
 
 import discord
 from redbot.cogs.mod import Mod as ModClass
@@ -14,7 +16,7 @@ from redbot.core.utils.predicates import MessagePredicate
 from redbot.core.utils.menus import menu, DEFAULT_CONTROLS
 
 log = logging.getLogger("red.flarecogs.mod")
-
+trans = Translator()
 
 class Mod(ModClass):
     """Mod with timed mute."""
@@ -530,3 +532,18 @@ class Mod(ModClass):
 
         rendered_results = [str(i+1)+"/"+str(len(results))+"\nUser: "+v.user.name+"("+str(v.user.id)+")\nReason: "+v.reason for i,v in enumerate(results)]
         await menu(ctx, rendered_results, DEFAULT_CONTROLS)
+
+    @commands.guild_only()
+    @checks.mod_or_permissions(manage_roles=True)
+    @commands.command(aliases=["t"])
+    async def translate(self, ctx, *, message: Union[discord.Message, str]):
+        if type(message) == str:
+            translated = trans.translate(message)
+            em = discord.Embed(colour=discord.Colour.green(), description="\n**Translation:**\n"+translated.text+"")
+            em.add_field(name="Source:", value=message)
+            await ctx.send(embed=em)
+        else:
+            translated = trans.translate(message.content)
+            em = discord.Embed(colour=discord.Colour.green(), description="\n**Translation:**\n"+translated.text+"")
+            em.add_field(name="Source:", value=message.content)
+            await ctx.send(embed=em)
