@@ -145,8 +145,47 @@ class Forward(commands.Cog):
             await ctx.send(
                 "Oops. I couldn't deliver your message to {}. They most likely have me blocked or DMs closed!".format(user)
             )
-        em = discord.Embed(colour=discord.Colour.green(), description="Message delivered to {}".format(user)+"\n``"+message+"``")
+        em = discord.Embed(colour=discord.Colour.green(), description="Message delivered to {}".format(user)+"\n**"+message+"**")
         em.set_footer(text="@"+ctx.author.name+"#"+ctx.author.discriminator+" | "+random_hash, icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=em)
+        async with self.config.reply() as reply:
+            reply[str(ctx.author.id)] = user.id
+
+    @commands.command()
+    @commands.guild_only()
+    @checks.guildowner()
+    async def tpm(self, ctx, language, user: discord.Member, *, message: str):
+        """Translated PMs a person.
+
+        Separate version of [p]dm but allows for guild owners. This only works for users in the
+        guild.
+        """
+        translated = trans.translate(message, dest=language)
+        em = discord.Embed(colour=discord.Colour.red(), description="**Translation:**\n"+translated.text)
+        em.add_field(name="Source:", value=message)
+
+        # if ctx.bot.user.avatar_url:
+        #     em.set_author(
+        #         name=f"Message from {ctx.author} | {ctx.author.id}",
+        #         icon_url=ctx.bot.user.avatar_url,
+        #     )
+        # else:
+        #     em.set_author(name=f"Message from {ctx.author} | {ctx.author.id}")
+
+        em.set_author(name=f"Message from MTA Staff")
+
+        random_hash = uuid.uuid4().hex
+        em.set_footer(text=random_hash)
+
+        try:
+            await user.send(embed=em)
+        except discord.Forbidden:
+            await ctx.send(
+                "Oops. I couldn't deliver your message to {}. They most likely have me blocked or DMs closed!".format(user)
+            )
+        em = discord.Embed(colour=discord.Colour.green(), description="Message delivered to {}".format(user)+"\n**Translation:**\n"+translated.text+"")
+        em.set_footer(text="@"+ctx.author.name+"#"+ctx.author.discriminator+" | "+random_hash, icon_url=ctx.author.avatar_url)
+        em.add_field(name="Source:", value=message)
         await ctx.send(embed=em)
         async with self.config.reply() as reply:
             reply[str(ctx.author.id)] = user.id
