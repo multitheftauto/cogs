@@ -1,6 +1,8 @@
 from redbot.core import commands, checks, Config
+from googletrans import Translator
 import discord, uuid
 
+trans = Translator()
 
 class Forward(commands.Cog):
     """Forward messages sent to the bot to the bot owner or in a specified channel."""
@@ -69,6 +71,11 @@ class Forward(commands.Cog):
             embeds[0].set_author(
                 name=f"{message.author} | {message.author.id}", icon_url=message.author.avatar_url
             )
+            result = trans.detect(message.content)
+            if result.lang != "en":
+                translated = trans.translate(message.content)
+                embeds[0].add_field(name="Language", value=result.lang)
+                embeds[0].add_field(name="Translation", value=translated.text)
             embeds = self._append_attachements(message, embeds)
             embeds[-1].timestamp = message.created_at
             for embed in embeds:
