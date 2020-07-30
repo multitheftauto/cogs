@@ -374,7 +374,7 @@ class Mod(ModClass):
     async def ban(
         self,
         ctx: commands.Context,
-        user: discord.Member,
+        user: Union[discord.Member, discord.User],
         duration: Optional[commands.TimedeltaConverter] = None,
         purge_days: Optional[int] = None,
         *,
