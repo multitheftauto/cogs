@@ -26,7 +26,8 @@ class Stats(commands.Cog):
                     await ase.parse(await response.read())
 
             for server in ase.servers:
-                total += server["players"]
+                if not server["version"].endswith("n"):
+                    total += server["players"]
             await ctx.channel.send("There are currently "+str(total)+" players online!")
 
     @stats.command()
@@ -42,5 +43,6 @@ class Stats(commands.Cog):
             top = sorted(ase.servers, key=lambda k: k['players'], reverse=True)[:10]
             embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Multi Theft Auto Top Servers")
             for v in top:
-                embed.add_field(name="**"+v["name"]+"**", value=str(v["players"])+"/"+str(v["maxplayers"]), inline=False)
+                if not v["version"].endswith("n"):
+                    embed.add_field(name="**"+v["name"]+"**", value=str(v["players"])+"/"+str(v["maxplayers"]), inline=False)
             await ctx.channel.send(embed=embed)
