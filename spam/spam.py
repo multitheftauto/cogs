@@ -61,7 +61,7 @@ class spam(commands.Cog):
         strings = await self.config.guild(ctx.guild).strings()
         msg = ""
         for key in strings:
-            msg += "``{}`` > ``{}``".format(key, strings[key])
+            msg += "``{}`` > ``{}``\n".format(key, strings[key])
         await ctx.maybe_send_embed(msg if msg else "List is empty.")
         pass
 
