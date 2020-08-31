@@ -1,0 +1,11 @@
+{
+    "author": ["Deihim007"],
+    "install_msg": "",
+    "name": "spam",
+    "disabled": false,
+    "short": "",
+    "description": "MTA:SA Spam Protection Cog",
+    "tags": [],
+    "requirements": [],
+    "hidden": false
+}
