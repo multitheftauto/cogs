@@ -374,7 +374,7 @@ class Mod(ModClass):
     async def ban(
         self,
         ctx: commands.Context,
-        user: Union[discord.Member, discord.User],
+        user: Union[discord.Member, discord.User, str],
         duration: Optional[commands.TimedeltaConverter] = None,
         purge_days: Optional[int] = None,
         *,
@@ -387,9 +387,8 @@ class Mod(ModClass):
         author = ctx.author
         days = purge_days
 
-        # user = guild.get_member(user_id)
-        # if not user:
-        #     user = await self.bot.fetch_user(user_id)
+        if type(user) is str:
+            user = await self.bot.fetch_user(user)
 
         if not user:
             await ctx.send(
