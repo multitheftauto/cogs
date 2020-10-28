@@ -340,19 +340,18 @@ class EventMixin:
         author = message.author
         if perp is None:
             infomessage = _(
-                "{emoji} `{time}` A message from **{author}** (`{a_id}`) was deleted in {channel}\n{jump_url}"
+                "{emoji} `{time}` A message from **{author}** (`{a_id}`) was deleted in {channel}"
             ).format(
                 emoji=settings["emoji"],
                 time=time.strftime("%H:%M:%S"),
                 author=author,
                 channel=message_channel.mention,
                 a_id=author.id,
-                jump_url=message.jump_url
             )
         else:
             infomessage = _(
                 "{emoji} `{time}` {perp} deleted a message from "
-                "**{author}** (`{a_id}`) in {channel}\n{jump_url}"
+                "**{author}** (`{a_id}`) in {channel}"
             ).format(
                 emoji=settings["emoji"],
                 time=time.strftime("%H:%M:%S"),
@@ -360,7 +359,6 @@ class EventMixin:
                 author=author,
                 a_id=author.id,
                 channel=message_channel.mention,
-                jump_url=message.jump_url
             )
         if embed_links:
             embed = discord.Embed(
@@ -369,7 +367,7 @@ class EventMixin:
                 timestamp=time,
             )
 
-            embed.add_field(name=_("Channel"), value=message_channel.mention+"\n"+message.jump_url)
+            embed.add_field(name=_("Channel"), value=message_channel.mention+" - [Goto]({})".format(message.jump_url))
             if perp:
                 embed.add_field(name=_("Deleted by"), value=perp)
             if message.attachments:
@@ -421,7 +419,7 @@ class EventMixin:
                 colour=await self.get_event_colour(guild, "message_delete"),
             )
             embed.set_author(name=_("Bulk message delete"), icon_url=guild.icon_url)
-            embed.add_field(name=_("Channel"), value=message_channel.mention+"\n"+message.jump_url)
+            embed.add_field(name=_("Channel"), value=message_channel.mention)
             embed.add_field(name=_("Messages deleted"), value=str(message_amount))
             await channel.send(embed=embed)
         else:
