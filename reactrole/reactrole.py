@@ -17,7 +17,7 @@ class ReactRole(commands.Cog):
         self.config.register_guild(**defaultsguild)
         self.config.register_global(**defaults)
         self.stamps = {}
-        self.period = 5
+        self.period = 1
 
     @commands.group()
     async def reactrole(self, ctx):
