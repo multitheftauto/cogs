@@ -22,7 +22,7 @@ class Forward(commands.Cog):
         self.config = Config.get_conf(
             self, 1398467138478, force_registration=True)
         default_global = {"toggles": {"botmessages": False},
-                          "destination": None, "reply": {}, "blocked": {}}
+                          "destination": None, "reply": {}, "blocked": {}, "modlog": None}
         self.config.register_global(**default_global)
 
     async def _destination(self, msg: str = None, embed: discord.Embed = None):
@@ -125,6 +125,18 @@ class Forward(commands.Cog):
             else {"msg": f"Notifications will be sent in {channel.mention}.", "config": channel.id}
         )
         await self.config.destination.set(data["config"])
+        await ctx.send(data["msg"])
+
+    @forwardset.command()
+    async def modlog(self, ctx, channel: discord.TextChannel = None):
+        """Set modlog channel
+        """
+        data = (
+            {"msg": "Modlog will not be sent.", "config": None}
+            if channel is None
+            else {"msg": f"Modlog will be sent in {channel.mention}.", "config": channel.id}
+        )
+        await self.config.modlog.set(data["config"])
         await ctx.send(data["msg"])
 
     @commands.command()
@@ -284,4 +296,13 @@ class Forward(commands.Cog):
     async def talk(self, ctx, channel: discord.TextChannel, *, message: str):
         """Send message in a channel
         """
-        await channel.send(message)
+        msg = await channel.send(message)
+        channel = await self.config.modlog()
+        if channel:
+            channel = self.bot.get_channel(channel)
+            random_hash = uuid.uuid4().hex
+            em = discord.Embed(colour=discord.Colour.green(
+            ), description="Message delivered to <#{}".format(channel.id)+">\n``"+message+"``\n[Goto]({})".format(msg.jump_url))
+            em.set_footer(text="@"+ctx.author.name+"#"+ctx.author.discriminator +
+                          " | "+random_hash, icon_url=ctx.author.avatar_url)
+            await channel.send(embed=em)
