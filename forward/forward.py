@@ -240,7 +240,7 @@ class Forward(commands.Cog):
     @commands.command(name="r")
     @commands.guild_only()
     @checks.guildowner()
-    async def replay(self, ctx, *, message: str):
+    async def reply(self, ctx, *, message: str):
         """Reply your last pm recipient
         """
         reply = await self.config.reply()
