@@ -277,3 +277,11 @@ class Forward(commands.Cog):
         em.set_footer(text="@"+ctx.author.name+"#"+ctx.author.discriminator +
                       " | "+random_hash, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=em)
+
+    @commands.guild_only()
+    @checks.mod_or_permissions(manage_roles=True)
+    @commands.command()
+    async def talk(self, ctx, channel: discord.TextChannel, *, message: str):
+        """Send message in a channel
+        """
+        await channel.send(message)
