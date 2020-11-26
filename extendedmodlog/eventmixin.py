@@ -367,7 +367,7 @@ class EventMixin:
                 timestamp=time,
             )
 
-            embed.add_field(name=_("Channel"), value=message_channel.mention+" - [Goto]({})".format(message.jump_url))
+            embed.add_field(name=_("Channel"), value=message_channel.mention+" ({}) - [Goto]({})".format(message_channel.id, message.jump_url))
             if perp:
                 embed.add_field(name=_("Deleted by"), value=perp)
             if message.attachments:
