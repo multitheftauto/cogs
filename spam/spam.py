@@ -1,7 +1,15 @@
 import discord
+import re
 from redbot.core import commands, checks, data_manager
 from redbot.core.config import Config
 from redbot.core.utils import mod
+from typing import Union, Pattern
+
+
+INVITE_RE: Pattern = re.compile(
+    r"(?:https?\:\/\/)?discord(?:\.gg|(?:app)?\.com\/invite)\/([a-zA-Z0-9]+)", re.I
+)
+
 
 class spam(commands.Cog):
     """ MTA:SA Spam Cog """
@@ -16,6 +24,8 @@ class spam(commands.Cog):
 
         default_guild = {
             "strings": {},
+            "invites": {},
+            "channels": {},
             "active": False,
             "feed": None
         }
@@ -48,6 +58,36 @@ class spam(commands.Cog):
                 await ctx.maybe_send_embed("This name is already taken.")
 
     @spam.command()
+    async def invite(self, ctx, invite: discord.Invite):
+        if invite.guild:
+            guild_id = str(invite.guild.id)
+            guild_name = invite.guild.name
+            async with self.config.guild(ctx.guild).invites() as invites:
+                if guild_id not in invites:
+                    invites[guild_id] = guild_name
+                    await ctx.maybe_send_embed("Added {}: ``{}`` to the list".format(guild_name, guild_id))
+                else:
+                    del invites[guild_id]
+                    await ctx.maybe_send_embed("Removed {}: ``{}`` from the list".format(guild_name, guild_id))
+        else:
+            await ctx.maybe_send_embed("Couldn't resolve the invite.")
+
+    @spam.command()
+    async def channel(self, ctx, channel: discord.TextChannel):
+        if channel:
+            channel_id = str(channel.id)
+            channel_name = channel.name
+            async with self.config.guild(ctx.guild).channels() as channels:
+                if channel_id not in channels:
+                    channels[channel_id] = channel_name
+                    await ctx.maybe_send_embed("Added {}: ``{}`` to the whitelist".format(channel_name, channel_id))
+                else:
+                    del channels[channel_id]
+                    await ctx.maybe_send_embed("Removed {}: ``{}`` from the whitelist".format(channel_name, channel_id))
+        else:
+            await ctx.maybe_send_embed("Couldn't find channel.")
+
+    @spam.command()
     async def remove(self, ctx, name):
         async with self.config.guild(ctx.guild).strings() as strings:
             if name in strings:
@@ -58,12 +98,17 @@ class spam(commands.Cog):
 
     @spam.command(name="list")
     async def _list(self, ctx):
+        invites = await self.config.guild(ctx.guild).invites()
+        channels = await self.config.guild(ctx.guild).channels()
         strings = await self.config.guild(ctx.guild).strings()
         msg = ""
+        for key in channels:
+            msg += "``Allowed Channel: {}`` > ``{}``\n".format(channels[key], key)
+        for key in invites:
+            msg += "``Blocked Server: {}`` > ``{}``\n".format(invites[key], key)
         for key in strings:
             msg += "``{}`` > ``{}``\n".format(key, strings[key])
         await ctx.maybe_send_embed(msg if msg else "List is empty.")
-        pass
 
     @checks.admin_or_permissions(manage_roles=True)
     @spam.command()
@@ -81,6 +126,31 @@ class spam(commands.Cog):
         active = await self.config.guild(ctx.guild).active()
         if not active:
             return
+
+        find = INVITE_RE.findall(ctx.clean_content)
+        print(find)
+        if find:
+            channels = await self.config.guild(ctx.guild).channels()
+            if str(ctx.channel.id) not in channels:
+                feed = await self.config.guild(ctx.guild).feed()
+                if feed:
+                    embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Spam protection deleted an invite (Whitlist) in <#"+str(ctx.channel.id)+">")
+                    embed.add_field(name="**Author:**", value="<@"+str(ctx.author.id)+">", inline=False)
+                    embed.add_field(name="**Message:**", value=ctx.content, inline=False)
+                    await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
+                return await ctx.delete()
+
+            invites = await self.config.guild(ctx.guild).invites()
+            for i in find:
+                invite = await self.bot.fetch_invite(i)
+                if str(invite.guild.id) in invites:
+                    feed = await self.config.guild(ctx.guild).feed()
+                    if feed:
+                        embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Spam protection deleted an invite (Blocked) in <#"+str(ctx.channel.id)+">")
+                        embed.add_field(name="**Author:**", value="<@"+str(ctx.author.id)+">", inline=False)
+                        embed.add_field(name="**Message:**", value=ctx.content, inline=False)
+                        await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
+                    return await ctx.delete()
 
         strings = await self.config.guild(ctx.guild).strings()
         for key in strings:
