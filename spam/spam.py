@@ -117,7 +117,7 @@ class spam(commands.Cog):
         await ctx.maybe_send_embed("The feed channel has been set to {}".format(channel_id))
 
     @commands.Cog.listener()
-    async def on_message_without_command(self, ctx):
+    async def on_message(self, ctx):
         if ctx.author.bot:
             return
         guild = ctx.guild
