@@ -118,8 +118,8 @@ class spam(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, ctx):
-        if ctx.author.bot:
-            return
+        # if ctx.author.bot:
+        #     return
         guild = ctx.guild
         if guild is None:
             return
@@ -128,7 +128,7 @@ class spam(commands.Cog):
             return
 
         find = INVITE_RE.findall(ctx.clean_content)
-        print(find)
+        # print(find)
         if find:
             channels = await self.config.guild(ctx.guild).channels()
             if str(ctx.channel.id) not in channels:
