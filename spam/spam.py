@@ -163,3 +163,7 @@ class spam(commands.Cog):
                     await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
                 await ctx.delete()
                 return
+
+    @commands.Cog.listener()
+    async def on_message_edit(self, _prior, ctx):
+        await self.on_message(ctx)
