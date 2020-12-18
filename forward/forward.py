@@ -302,7 +302,7 @@ class Forward(commands.Cog):
             channel = self.bot.get_channel(channel)
             random_hash = uuid.uuid4().hex
             em = discord.Embed(colour=discord.Colour.green(
-            ), description="Message delivered to <#{}".format(channel.id)+">\n``"+message+"``\n[Goto]({})".format(msg.jump_url))
+            ), description="Message delivered to <#{}".format(msg.channel.id)+">\n``"+message+"``\n[Goto]({})".format(msg.jump_url))
             em.set_footer(text="@"+ctx.author.name+"#"+ctx.author.discriminator +
                           " | "+random_hash, icon_url=ctx.author.avatar_url)
             await channel.send(embed=em)
