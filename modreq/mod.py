@@ -17,11 +17,16 @@ class ModReq(commands.Cog):
     @commands.command(name="mod", alias="mod")
     async def mod_request(self, ctx, *message):
         await ctx.message.delete()
-        embed = discord.Embed(colour=discord.Colour(0xf5a623), description="<@"+str(ctx.author.id)+"> requested a moderator in <#"+str(ctx.channel.id)+"> here: "+ctx.message.jump_url)
+        embed = discord.Embed(colour=discord.Colour(0xf5a623), description="<@"+str(ctx.author.id) +
+                              "> requested a moderator in <#"+str(ctx.channel.id)+"> here: "+ctx.message.jump_url)
         embed.add_field(name="**Reason:**", value=" ".join(message), inline=False)
         await self.bot.get_channel(int(await self.__config.guild(ctx.guild).feed())).send(embed=embed)
-        embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Your request was received <@"+str(ctx.author.id)+">, a moderator will review and report back soon.")
-        await ctx.author.send(embed=embed)
+
+        try:
+            embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Your request was received <@"+str(ctx.author.id)+">, a moderator will review and report back soon.")
+            await ctx.author.send(embed=embed)
+        except:
+            pass
 
     @checks.admin_or_permissions(manage_roles=True)
     @commands.command()
