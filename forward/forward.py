@@ -147,6 +147,13 @@ class Forward(commands.Cog):
         await self.config.modlog.set(data["config"])
         await ctx.send(data["msg"])
 
+    @forwardset.command()
+    async def response(self, ctx, message: str):
+        """Set auto response message
+        """
+        await self.config.response.set(message)
+        await ctx.send('Done!')
+
     @commands.command()
     @commands.guild_only()
     @checks.guildowner()
