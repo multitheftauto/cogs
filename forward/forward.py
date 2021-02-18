@@ -22,8 +22,10 @@ class Forward(commands.Cog):
         self.config = Config.get_conf(
             self, 1398467138478, force_registration=True)
         default_global = {"toggles": {"botmessages": False},
-                          "destination": None, "reply": {}, "blocked": {}, "modlog": None}
+                          "destination": None, "reply": {}, "blocked": {}, "modlog": None, "response": "Hi there, this is an automated reply."}
         self.config.register_global(**default_global)
+
+        self.welcome = {}
 
     async def _destination(self, msg: str = None, embed: discord.Embed = None):
         await self.bot.wait_until_ready()
@@ -59,8 +61,8 @@ class Forward(commands.Cog):
             return
         if message.channel.recipient.id in self.bot.owner_ids:
             return
+        userid = str(message.author.id)
         async with self.config.blocked() as blocked:
-            userid = str(message.author.id)
             if userid in blocked:
                 return
         if message.author == self.bot.user:
@@ -83,6 +85,12 @@ class Forward(commands.Cog):
             embeds[0].set_author(
                 name=f"{message.author} | {message.author.id}", icon_url=message.author.avatar_url
             )
+
+            if userid not in self.welcome:
+                self.welcome[userid] = True
+                response = await self.config.response()
+                embeds[0].add_field(name="Auto Replied:", value=response)
+                await message.channel.send(response)
             # result = trans.detect(message.content)
             # if result.lang != "en":
             #     translated = trans.translate(message.content)
