@@ -127,6 +127,9 @@ class spam(commands.Cog):
         if not active:
             return
 
+        if not await ctx.bot.is_mod(ctx.author):
+            return
+
         find = INVITE_RE.findall(ctx.clean_content)
         # print(find)
         if find:
