@@ -148,7 +148,7 @@ class Forward(commands.Cog):
         await ctx.send(data["msg"])
 
     @forwardset.command()
-    async def response(self, ctx, message: str):
+    async def response(self, ctx, *, message: str):
         """Set auto response message
         """
         await self.config.response.set(message)
