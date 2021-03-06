@@ -1,241 +1,272 @@
-===================================================
-Redbot cogs for Red-DiscordBot authored by Kreusada
-===================================================
+.. _dehoister:
 
-This is my repository for Red Discord-Bot. I built these cogs because these were the features that I wanted for my bot, `WALL-E. <https://discord.com/oauth2/authorize?client_id=766580519000473640&scope=bot&permissions=8>`_
+=========
+Dehoister
+=========
 
-These cogs have been approved by the Red-DiscordBot QA team.
+This is the cog guide for the dehoister cog. You will
+find detailed docs about usage and commands.
+
+Throughout this documentation, ``[p]`` is considered as your prefix.
 
 ------------
 Installation
 ------------
 
-Primarily, make sure you have `downloader` loaded. 
+Let's firstly add my repository if you haven't already:
+
+* :code:`[p]repo add kreusada https://github.com/kreusada/kreusadacogs`
+
+Next, let's download the cog from the repo:
+
+* :code:`[p]cog install kreusada dehoister`
+
+Finally, you can see my end user data statements, cog requirements, and other cog information by using:
+
+* :code:`[p]cog info kreusada dehoister`
+
+-----
+Usage
+-----
+
+Dehoister will protect your guild against users with hoisted usernames. Hoisted names are often used to
+promote scams, hate speech, guilds, and other things which may come across as malicious. Or, its just your
+average discord user going "I'm at the top of the member list look at me look at meeee!".
+
+This cog will take action on any user, if their name starts with one of `these characters <https://github.com/kreusada/Kreusada-Cogs/blob/master/dehoister/dehoister.py#L40>`_.
+
+They are the only characters that come above numbers and letters in ASCII, and if a user's name starts
+with one of these, 90% of the time it will be because they want to be hoisted.
+
+Features include 'scanning and cleaning' and auto-dehoisting, with lots of customization such as the nickname,
+and modlog events.
+
+.. _dehoister-commands:
+
+--------
+Commands
+--------
+
+Here's a list of all commands available for this cog.
+
+.. _dehoister-command-hoist:
+
+^^^^^
+hoist
+^^^^^
+
+**Syntax**
 
 .. code-block:: ini
 
-    [p]load Downloader
+    [p]hoist
 
-Next, let's add my repository to your system.
+**Description**
+
+This is the main command used for dehoister.
+It will be used for all other commands.
+
+.. _dehoister-command-hoist-clean:
+
+"""""""""""
+hoist clean
+"""""""""""
+
+**Syntax**
 
 .. code-block:: ini
 
-    [p]repo add kreusadacogs https://github.com/kreusada/kreusadacogs
+    [p]hoist clean
 
-To install a cog, use this command, replacing <cog> with the name of the cog you wish to install:
+**Description**
+
+Dehoist all members in the guild.
+
+.. note:: Your server owner's nickname cannot be changed due to Discord permissions.
+
+.. _dehoister-command-hoist-dehoist:
+
+"""""""""""""
+hoist dehoist
+"""""""""""""
+
+**Syntax**
 
 .. code-block:: ini
 
-    [p]cog install kreusadacogs <cog>
+    [p]hoist dehoist <member>
 
--------------------
-Available cogs list
--------------------
+**Description**
 
-+-----------------+--------------------------------------------------------------+---------+----------+
-| Cog Name        | Description                                                  | Tags    | Author   |
-+=================+==============================================================+=========+==========+
-| advanceduptime  | Uptime but with additional statistics and inside an embed.   | Tools   | Kreusada |
-+-----------------+--------------------------------------------------------------+---------+----------+
-| bubblewrap      | Get some bubblewrap.                                         | Fun     | Kreusada |
-+-----------------+--------------------------------------------------------------+---------+----------+
-| codify          | Get messages and transform them into code blocks.            | Tools   | Kreusada |
-+-----------------+--------------------------------------------------------------+---------+----------+
-| dehoister       | Dehoist new users with a variety of powerful tools.          | Mod     | Kreusada |
-+-----------------+--------------------------------------------------------------+---------+----------+
-| namegenerator   | Generate random names will optional gender arguments.        | Fun     | Kreusada |
-+-----------------+--------------------------------------------------------------+---------+----------+
-| pinginvoke      | r2d2? wall-e? Invoke ping by asking if your bot's there.     | Tools   | Kreusada |
-+-----------------+--------------------------------------------------------------+---------+----------+
-| pingoverride    | Replace "Pong." with your own response!                      | Tools   | Kreusada |
-+-----------------+--------------------------------------------------------------+---------+----------+
-| ram             | Get your bot's random access memory.                         | Tools   | Kreusada |
-+-----------------+--------------------------------------------------------------+---------+----------+
-| sendcards       | Send christmas, birthday, valentines and get well soon cards | Fun     | Kreusada |
-+-----------------+--------------------------------------------------------------+---------+----------+
-| staff           | Alert staff for   conspicuous activity.                      | Mod     | Kreusada |
-+-----------------+--------------------------------------------------------------+---------+----------+
-| textmanipulator | Manipulate text and words with tools.                        | Tools   | Kreusada |
-+-----------------+--------------------------------------------------------------+---------+----------+
-| timestables     | Learn your times tables with an 'against the clock' game.    | Fun     | Kreusada |
-+-----------------+--------------------------------------------------------------+---------+----------+
-| votechannel     | Designate a channel to add voting reactions (customizable).  | Tools   | Kreusada |
-+-----------------+--------------------------------------------------------------+---------+----------+
+Dehoist a particular member.
 
-------------
-Contributing
-------------
+.. note:: Your server owner's nickname cannot be changed due to Discord permissions.
 
-Feel free to open a pull request, or an issue, I'm more than happy to make changes to my work.
+**Arguments**
 
--------
-Support
--------
+* ``<member>``: The member to dehoist.
 
-Check out my docs `here <https://kreusadacogs.readthedocs.io/en/latest/>`_
+.. _dehoister-command-hoist-explain:
 
-Mention me in the #support_othercogs in the `cog support server <https://discord.gg/GET4DVk>`_ if you need any help.
+"""""""""""""
+hoist explain
+"""""""""""""
 
-If you're have an important issue(s), open an issue or pull request to this repo.
-You can also join my `support server <https://discord.gg/JmCFyq7>`_.
+**Syntax**
 
--------
-Credits
--------
+.. code-block:: ini
 
-* Jojo - Got me started with python, and helped me a lot in my early stages.
-* Sauri - Learnt how to use `bot.wait_for` via your application cog.
-* Flare - Learnt from his userinfo cog, how to replace a command in core, and then add it back on cog unload.
-* Trusty - Using reading from json in cog setup files.
-* Tobotimus - Lots of backend support.
-* Red-DiscordBot - An amazing community, some features have been modified from their repo to use here.
-* W3Schools - An amazing website full of python tricks and tips which have helped me out many times.
-* Stack Overflow - Of course, I mean who hasn't payed a trip to stack overflow?
+    [p]hoist explain
 
--------------
-GitHub Labels
--------------
+**Description**
 
-**Category Labels**
+Explain how Dehoister works.
 
-* Category: Meta - Related to my repo such as files in ``.github``.
-* Category: Internationalization - Related to Internationalization and locales.
+.. _dehoister-command-hoist-explain-auto:
 
-**Cog Labels**
+""""""""""""""""""
+hoist explain auto
+""""""""""""""""""
 
-Each cog has it's own label to show if the cog has had changes to. 
+**Syntax**
 
-**Status Labels**
+.. code-block:: ini
 
-Each issue or PR **must** have a status label (so that I can keep organised lol)
+    [p]hoist explain auto
 
-* Status: Admin - Covered by Kreusada, this would normally be for meta.
-* Status: Expansive - This issue/PR has had more ideas from the original idea.
-* Status: Infeasible - Invalid/off topic.
-* Status: Lamented - Died out or behind schedule in accordance to it's milestone/project.
-* Status: Passed - PR/Issue has been successfully resolved or has received positive reviews.
-* Status: Processing - This PR/Issue is being processed.
-* Status: Progress - This PR/Issue is in progress.
-* Status: Rejected - I will not be making changes to this feature.
-* Status: Requested Changes - Requested changes to this PR. (PR only)
-* Status: Triage Requested - This issue has not yet been reviewed or opened.
-* Status: Withdrawn - Withdrawn from action.
+**Description**
 
-Additional info:
+Explain how auto-dehoist works.
 
-The lamented label basically means that I really want to get this done, but I aimed for a 
-previous milestone which I did not get round to doing. 
+To get started, use ``[p]hoist set toggle true``, which will enable this feature. Then, you can customize the nickname via ``[p]hoist set nickname``.
+When new users join the guild, their nickname will automatically be changed to this configured nickname, if they have a hoisted character at the start of their name.
+If your bot doesn't have permissions, this process will be cancelled, so make sure that your bot has access to nickname changing.
 
-There is more information on these labels in accordance with my project workflow in the 
-project workflow section of this README.
+.. _dehoister-command-hoist-explain-scanclean:
 
-**Type Labels**
+"""""""""""""""""""""""
+hoist explain scanclean
+"""""""""""""""""""""""
 
-Each issue or PR **must** have a type label (so that I can keep organised lol)
+**Syntax**
 
-* Type: Breaking Change - The outlined changes could potentially be breaking to other aspects of the cog.
-* Type: Bug - This is a bug report.
-* Type: Dev - For the dev branch (currently stale)
-* Type: Docs - For documentation (currently infeasible)
-* Type: Enhancement - This is an enhancement/feature.
+.. code-block:: ini
 
-**Doclog Labels**
+    [p]hoist explain scanclean
 
-I write and maintain documentation for all of my code on this repository.
-There are four Doclog labels which help me to differentiate between entries.
+**Description**
 
-* Doclog: Added - This change has been added to the documentation.
-* Doclog: Bypassed - This change does not need to be documented.
-* Doclog: Infeasible - This change is invalid and will not be documented.
-* Doclog: Pending - This change will be added to the documentation.
+Explain how scanning and cleaning works.
 
-----------------
-Project Workflow
-----------------
+If users were able to bypass the auto dehoister, due to the bot being down, or it was toggled off, there are still tools you can use to 
+protect your guild against hoisted names. ``[p]hoist scan`` will return a full list of users who have hoisted nicknames or usernames. 
+``[p]hoist clean`` will change everyones nickname to the configured nickname if they have a hoisted username/nickname.
 
-I like to add my issues and PRs to my project named 'Workflow',
-it helps to keep track of everything I need to get through.
+.. _dehoister-command-hoist-scan:
 
-There are four sections:
+""""""""""
+hoist scan
+""""""""""
 
-* To do
-* In progress
-* Done
-* Rejected/Infeasible
+**Syntax**
 
-If your issue/PR is in the ``To do`` section, that means that I haven't
-started looking at it. The issue/PR will have one of the following status labels:
+.. code-block:: ini
 
-* Status: Lamented
-* Status: Processing
-* Status: Triage Requested
-* Status: Requested Changes (PR Only)
+    [p]hoist scan
 
-If your issue/PR is in the ``In progress`` section, that means that I have started to 
-outline, test or develop the requested changes. The issue/PR will have one of the following status labels:
+**Description**
 
-* Status: Admin
-* Status: Progress
+Scan for hoisted members.
 
-If your issue/PR is in the ``Done`` section, that means the requested changes have been implemented or merged!
-The issue/PR will have one of the following status labels:
+This command will return a count and list of members.
+It will follow this format:
 
-* Status: Passed
+---------------------------------
 
-If your issue/PR is in the ``Rejected/Infeasible`` section, that means I am not making changes.
-The issue/PR will have one of the following status labels:
+X users found:
 
-* Status: Rejected
-* Status: Infeasible
-* Status: Withdrawn
+user#0001:
+- Their nickname (if applicable)
+-- Their user ID
 
-There is one more status label which hasn't been mentioned yet, which is ``Status: Expansive``.
-In order to have this label added, the initial changes must have the ``Status: Passed`` label.
-When the PR/issue has passed, and there are additional requested changes, the issue/PR will
-move back down to ``To do``, or ``In progress``, where it will continue its development with
-the expansive label.
+user#9999:
+- Their nickname (if applicable)
+-- Their user ID
 
-Please avoid elaborating profusely on original issues/PRs with outlined changes. I would much prefer
-it that you opened a new issue/PR with the requested changes, so that we won't even need to use the 
-expansive label.
+---------------------------------
 
-----------
-Milestones
-----------
+If there are more than 10 hoisted users, this list
+will instead be sent as a Discord file, named ``hoisted.txt``.
 
-I have milestones named after months of the year, followed by the year itself.
-This helps me to get my work done as soon as possible, aiming to hit the milestones that I add
-to the issue/PR. It also gives you an indication of when your issue/PR will be merged.
+.. _dehoister-command-hoist-set:
 
-If the milestone ``February 2020`` was added to your issue/PR, that means I want to get this
-implemented or merged BEFORE March 2020.
+"""""""""
+hoist set
+"""""""""
 
-**Failing to meet milestone deadlines**
+**Syntax**
 
-In the event that I fail to implement or merge the issue/pr to a sufficient level 
-before the deadline ends, you will receive one of two labels:
+.. code-block:: ini
 
-* Status: Lamented
-* Status: Rejected
+    [p]hoist set
 
-I have failed to meet the deadline for the following reasons:
+**Description**
 
-1. I'm not 100% certain about this PR/Issue.
-2. The requested changes could change the functionality of the cog.
-3. I'm very busy and don't have a lot of time to review your issue/PR.
-4. The requested changes are complicated, and has therefore taken too long to complete.
+Settings for dehoister.
 
-If I no longer want to work on the issue/PR, I will simply add the ``Status: Rejected`` label.
-If I want to continue work on this issue/PR, I will add the ``Status: Lamented`` label. This
-basically means it will be moved back to the ``To do`` project section until I am ready to start
-actively working on the issue/PR.
+.. _dehoister-command-hoist-set-nickname:
 
--------
-LICENSE
--------
+""""""""""""""""""
+hoist set nickname
+""""""""""""""""""
 
-This repository and its cogs are registered under the MIT License.
+**Syntax**
 
-For further information, please click `here <https://github.com/kreusada/Kreusada-Cogs/blob/master/LICENSE>`_
+.. code-block:: ini
 
-Copyright (c) 2021 kreusada
+    [p]hoist set nickname <nickname>
+
+**Description**
+
+Set the nickname which is applied to users with hoisted display names.
+
+This nickname will be referred to everytime this cog takes
+action on members with hoisted display names, so make sure you
+find a suitable display name!
+
+The default nickname that comes with the cog is ``δ Dehoisted``.
+
+**Arguments**
+
+* ``<nickname>``: The nickname to set to.
+
+.. _dehoister-command-hoist-set-toggle:
+
+""""""""""""""""
+hoist set toggle
+""""""""""""""""
+
+**Syntax**
+
+.. code-block:: ini
+
+    [p]hoist set toggle
+
+**Description**
+
+Toggle the auto-dehoister from dehoisting users who join the guild with hoisted usernames.
+When installed, this setting is FALSE by default.
+
+----------------------
+Additional Information
+----------------------
+
+This cog has been vetted by the Red-DiscordBot QA team as approved.
+For inquiries, see to the contact options below.
+
+---------------
+Receive Support
+---------------
+
+Feel free to ping me at the `Red Cog Support Server <https://discord.gg/GET4DVk>`_ in :code:`#support_othercogs`,
+or you can head over to `my support server <https://discord.gg/JmCFyq7>`_ and ask your questions in :code:`#support-kreusadacogs`.
