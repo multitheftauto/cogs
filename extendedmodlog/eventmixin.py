@@ -335,13 +335,26 @@ class EventMixin:
         )
         time = message.created_at
         perp = None
+        member = None
         if channel.permissions_for(guild.me).view_audit_log and check_audit_log:
             action = discord.AuditLogAction.message_delete
             async for log in guild.audit_logs(limit=2, action=action):
                 same_chan = log.extra.channel.id == message.channel.id
                 if log.target.id == message.author.id and same_chan:
                     perp = f"{log.user}({log.user.id})"
+                    member = await guild.fetch_member(log.user.id)
                     break
+
+        if member:
+            helper_role = await self.config.guild(guild).helper_role()
+            if helper_role:
+                for role in member.roles:
+                    if role.id == helper_role:
+                        helper_channel = await self.config.guild(guild).helper_channel()
+                        if helper_channel:
+                            channel = guild.get_channel(helper_channel)
+                        break
+
         message_channel = cast(discord.TextChannel, message.channel)
         author = message.author
         if perp is None:

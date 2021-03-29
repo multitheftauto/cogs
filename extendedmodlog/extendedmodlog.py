@@ -667,5 +667,35 @@ class ExtendedModLog(EventMixin, commands.Cog):
         else:
             await ctx.send(channel.mention + _(" is not being ignored."))
 
+    @_modlog.command()
+    async def sethelper(
+        self,
+        ctx: commands.Context,
+        role: discord.Role,
+    ) -> None:
+        """
+        Set helper role
+        """
+        guild = ctx.message.guild
+        if not guild:
+            return
+        await self.config.guild(guild).helper_role.set(role.id)
+        await ctx.send("Done")
+    
+    @_modlog.command()
+    async def sethelperchannel(
+        self,
+        ctx: commands.Context,
+        channel: discord.TextChannel,
+    ) -> None:
+        """
+        Set helper role channel
+        """
+        guild = ctx.message.guild
+        if not guild:
+            return
+        await self.config.guild(guild).helper_channel.set(channel.id)
+        await ctx.send("Done")
+
     def __unload(self):
         self.loop.cancel()

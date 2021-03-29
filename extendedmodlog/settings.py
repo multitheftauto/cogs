@@ -128,4 +128,6 @@ inv_settings = {
     },
     "ignored_channels": [],
     "invite_links": {},
+    "helper_role": None,
+    "helper_channel": None,
 }
