@@ -47,6 +47,8 @@ class ModSettings(MixinMeta):
         delete_delay = data["delete_delay"]
         reinvite_on_unban = data["reinvite_on_unban"]
         dm_on_kickban = data["dm_on_kickban"]
+        ban_message = data["ban_message"]
+        show_user_id = data["show_user_id"]
         default_days = data["default_days"]
         default_tempban_duration = data["default_tempban_duration"]
         if not track_all_names and track_nicknames:
@@ -92,6 +94,12 @@ class ModSettings(MixinMeta):
         )
         msg += _("Send message to users on kick/ban: {yes_or_no}\n").format(
             yes_or_no=_("Yes") if dm_on_kickban else _("No")
+        )
+        msg += _("Ban Message: {ban_message}\n").format(
+            ban_message=ban_message if ban_message else _("None")
+        )
+        msg += _("Show User ID: {yes_or_no}\n").format(
+            yes_or_no=_("Yes") if show_user_id else _("No")
         )
         if default_days:
             msg += _("Default message history delete on ban: Previous {num_days} days\n").format(
@@ -369,6 +377,44 @@ class ModSettings(MixinMeta):
         else:
             await ctx.send(
                 _("Bot will no longer attempt to send a DM to user before kick and ban.")
+            )
+
+    @modset.command()
+    @commands.guild_only()
+    async def banmessage(self, ctx: commands.Context, *, message: str = None):
+        """Ban Message
+
+        Use it without message arg to clear
+        """
+        guild = ctx.guild
+        if message is None:
+            await self.config.guild(guild).ban_message.set(None)
+            await ctx.send(
+                _("Ban message changed to default.")
+            )
+            return
+        else:
+            await self.config.guild(guild).ban_message.set(message)
+            await ctx.send(_("Ban message set to `{}`").format(message))
+
+    @modset.command()
+    @commands.guild_only()
+    async def showid(self, ctx: commands.Context, enabled: bool = None):
+        """Toggle whether user id should be sent on ban message
+        """
+        guild = ctx.guild
+        if enabled is None:
+            setting = await self.config.guild(guild).show_user_id()
+            await ctx.send(
+                _("Show user id on ban is currently set to: {setting}").format(setting=setting)
+            )
+            return
+        await self.config.guild(guild).show_user_id.set(enabled)
+        if enabled:
+            await ctx.send(_("Bot will now send user id on ban."))
+        else:
+            await ctx.send(
+                _("Bot will no longer send user id on ban.")
             )
 
     @modset.command()

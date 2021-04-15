@@ -58,6 +58,8 @@ class Mod(
         "reinvite_on_unban": False,
         "current_tempbans": [],
         "dm_on_kickban": False,
+        "ban_message": None,
+        "show_user_id": False,
         "default_days": 0,
         "default_tempban_duration": 60 * 60 * 24,
         "track_nicknames": True,

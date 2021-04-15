@@ -152,15 +152,24 @@ class KickBanMixin(MixinMeta):
             toggle = await self.config.guild(guild).dm_on_kickban()
             if toggle:
                 with contextlib.suppress(discord.HTTPException):
+                    ban_message = await self.config.guild(guild).ban_message()
                     em = discord.Embed(
                         title=bold(_("You have been banned from {guild}.").format(guild=guild)),
+                        description = ban_message or None,
                         color=await self.bot.get_embed_color(user),
                     )
                     em.add_field(
                         name=_("**Reason**"),
                         value=reason if reason is not None else _("No reason was given."),
-                        inline=False,
+                        inline=True,
                     )
+                    show_user_id = await self.config.guild(guild).show_user_id()
+                    if show_user_id:
+                        em.add_field(
+                            name=_("**User ID**"),
+                            value=user.id,
+                            inline=True,
+                        )
                     await user.send(embed=em)
 
             ban_type = "ban"
