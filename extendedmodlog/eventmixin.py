@@ -344,8 +344,7 @@ class EventMixin:
                     perp = f"{log.user}({log.user.id})"
                     member = await guild.fetch_member(log.user.id)
                     break
-
-        if member:
+        if member and await self.bot.is_mod(member):
             helper_role = await self.config.guild(guild).helper_role()
             if helper_role:
                 for role in member.roles:
