@@ -347,12 +347,12 @@ class EventMixin:
         if member and not await self.bot.is_mod(member):
             helper_role = await self.config.guild(guild).helper_role()
             if helper_role:
-                for role in member.roles:
-                    if role == helper_role:
-                        helper_channel = await self.config.guild(guild).helper_channel()
-                        if helper_channel:
-                            channel = guild.get_channel(helper_channel)
-                        break
+                role = discord.utils.find(lambda r: r.id == helper_role, member.roles)
+                if role:
+                    helper_channel = await self.config.guild(guild).helper_channel()
+                    if helper_channel:
+                        channel = guild.get_channel(helper_channel)
+                    break
 
         message_channel = cast(discord.TextChannel, message.channel)
         author = message.author
