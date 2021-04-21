@@ -352,7 +352,6 @@ class EventMixin:
                     helper_channel = await self.config.guild(guild).helper_channel()
                     if helper_channel:
                         channel = guild.get_channel(helper_channel)
-                    break
 
         message_channel = cast(discord.TextChannel, message.channel)
         author = message.author
