@@ -348,7 +348,7 @@ class EventMixin:
             helper_role = await self.config.guild(guild).helper_role()
             if helper_role:
                 for role in member.roles:
-                    if role.id == helper_role.id:
+                    if role == helper_role:
                         helper_channel = await self.config.guild(guild).helper_channel()
                         if helper_channel:
                             channel = guild.get_channel(helper_channel)
