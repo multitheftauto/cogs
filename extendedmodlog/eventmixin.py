@@ -280,6 +280,8 @@ class EventMixin:
         if not settings["enabled"]:
             return
         channel_id = payload.channel_id
+        if channel_id == 778610857931964456:
+            return
         try:
             channel = await self.modlog_channel(guild, "message_delete")
         except RuntimeError:
