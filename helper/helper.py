@@ -27,6 +27,7 @@ class Helper(commands.Cog):
                 await self.bot.get_channel(int(feed_id)).send(embed=embed)
         pass
 
+    @checks.admin_or_permissions(manage_roles=True)
     @commands.group()
     async def helperset(self, ctx):
         pass
