@@ -139,7 +139,7 @@ class spam(commands.Cog):
         channels = await self.config.guild(ctx.guild).channels()
         msg = ""
         for key in channels:
-            msg += "**{}** ({}) ".format(channels[key], key)
+            msg += "**{}** ({}) \n".format(channels[key], key)
         if not msg:
             await ctx.maybe_send_embed("List is empty.")
         msg = "**Allowed Channels:**\n"+msg
