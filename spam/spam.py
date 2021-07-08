@@ -4,6 +4,8 @@ from redbot.core import commands, checks, data_manager
 from redbot.core.config import Config
 from redbot.core.utils import mod
 from typing import Union, Pattern
+from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
+from redbot.core.utils.chat_formatting import pagify
 
 
 INVITE_RE: Pattern = re.compile(
@@ -108,7 +110,9 @@ class spam(commands.Cog):
             msg += "``Blocked Server: {}`` > ``{}``\n".format(invites[key], key)
         for key in strings:
             msg += "``{}`` > ``{}``\n".format(key, strings[key])
-        await ctx.maybe_send_embed(msg if msg else "List is empty.")
+        if not msg:
+            await ctx.maybe_send_embed("List is empty.")
+        await menu(ctx, list(pagify(msg)), DEFAULT_CONTROLS)
 
     @checks.admin_or_permissions(manage_roles=True)
     @spam.command()
