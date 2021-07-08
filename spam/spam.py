@@ -115,7 +115,7 @@ class spam(commands.Cog):
         strings = await self.config.guild(ctx.guild).strings()
         msg = ""
         for key in strings:
-            msg += "**Blocked Text:** {} > {} \n".format(key, strings[key])
+            msg += "**{}** ({}) \n".format(key, strings[key])
         if not msg:
             await ctx.maybe_send_embed("List is empty.")
         msg = "**Blocked Text:**\n"+msg
