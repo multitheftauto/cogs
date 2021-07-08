@@ -38,10 +38,12 @@ class spam(commands.Cog):
     @commands.guild_only()
     @commands.group()
     async def spam(self, ctx):
+        """ Spam protection commands """
         pass
 
     @spam.command()
     async def toggle(self, ctx):
+        """ Toggle spam protection status """
         active = await self.config.guild(ctx.guild).active()
         if active:
             await self.config.guild(ctx.guild).active.set(False)
@@ -52,6 +54,7 @@ class spam(commands.Cog):
 
     @spam.command()
     async def add(self, ctx, name, *, string):
+        """ Add a text to spam protection detection """
         async with self.config.guild(ctx.guild).strings() as strings:
             if name not in strings:
                 strings[name] = string
@@ -61,6 +64,7 @@ class spam(commands.Cog):
 
     @spam.command()
     async def invite(self, ctx, invite: discord.Invite):
+        """ Add an invite to blacklist """
         if invite.guild:
             guild_id = str(invite.guild.id)
             guild_name = invite.guild.name
@@ -76,6 +80,7 @@ class spam(commands.Cog):
 
     @spam.command()
     async def channel(self, ctx, channel: discord.TextChannel):
+        """ Add a channel to whitelist """
         if channel:
             channel_id = str(channel.id)
             channel_name = channel.name
@@ -91,6 +96,7 @@ class spam(commands.Cog):
 
     @spam.command()
     async def remove(self, ctx, name):
+        """ Remove a text from spam protection detection """
         async with self.config.guild(ctx.guild).strings() as strings:
             if name in strings:
                 del strings[name]
@@ -98,25 +104,51 @@ class spam(commands.Cog):
             else:
                 await ctx.maybe_send_embed("Doesn't exist.")
 
-    @spam.command(name="list")
+    @spam.group(name="list")
     async def _list(self, ctx):
-        invites = await self.config.guild(ctx.guild).invites()
-        channels = await self.config.guild(ctx.guild).channels()
+        """ Shows a list of spam protection parameters """
+        pass
+
+    @_list.command()
+    async def text(self, ctx):
+        """ Shows a list of blocked texts"""
         strings = await self.config.guild(ctx.guild).strings()
         msg = ""
-        for key in channels:
-            msg += "``Allowed Channel: {}`` > ``{}``\n".format(channels[key], key)
-        for key in invites:
-            msg += "``Blocked Server: {}`` > ``{}``\n".format(invites[key], key)
         for key in strings:
-            msg += "``{}`` > ``{}``\n".format(key, strings[key])
+            msg += "**Blocked Text:** {} > {} \n".format(key, strings[key])
         if not msg:
             await ctx.maybe_send_embed("List is empty.")
+        msg = "**Blocked Text:**\n"+msg
+        await menu(ctx, list(pagify(msg)), DEFAULT_CONTROLS)
+
+    @_list.command()
+    async def server(self, ctx):
+        """ Shows a list of blocked servers """
+        invites = await self.config.guild(ctx.guild).invites()
+        msg = ""
+        for key in invites:
+            msg += "**{}** ({}) \n".format(invites[key], key)
+        if not msg:
+            await ctx.maybe_send_embed("List is empty.")
+        msg = "**Blocked Server:**\n"+msg
+        await menu(ctx, list(pagify(msg)), DEFAULT_CONTROLS)
+
+    @_list.command()
+    async def channel(self, ctx):
+        """ Shows a list of allowed channels """
+        channels = await self.config.guild(ctx.guild).channels()
+        msg = ""
+        for key in channels:
+            msg += "**{}** ({}) ".format(channels[key], key)
+        if not msg:
+            await ctx.maybe_send_embed("List is empty.")
+        msg = "**Allowed Channels:**\n"+msg
         await menu(ctx, list(pagify(msg)), DEFAULT_CONTROLS)
 
     @checks.admin_or_permissions(manage_roles=True)
     @spam.command()
     async def setfeed(self, ctx, channel_id):
+        """ Sets the feed channel for spam protection notifications """
         await self.config.guild(ctx.guild).feed.set(channel_id)
         await ctx.maybe_send_embed("The feed channel has been set to {}".format(channel_id))
 
