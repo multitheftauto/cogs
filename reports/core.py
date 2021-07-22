@@ -345,7 +345,7 @@ class Reports(BASECOG):
                 await message.add_reaction("👎")
             except IndexError:
                 await message.edit("{} ({}) has claimed this.".format(user.mention, user.id))
-        elif: reaction.emoji == "👍":
+        elif reaction.emoji == "👍":
             try:
                 embed = message.embeds[0]
                 embed.add_field(
@@ -355,7 +355,7 @@ class Reports(BASECOG):
                 await message.clear_reactions()
             except IndexError:
                 await message.edit("{} ({}) has marked this resolved.".format(user.mention, user.id))
-        elif: reaction.emoji == "👎":
+        elif reaction.emoji == "👎":
             try:
                 embed = message.embeds[0]
                 embed.add_field(
