@@ -286,14 +286,12 @@ class Reports(BASECOG):
             if message.channel != emote_channel:
                 return False
 
-            reaction_emotes = ["👋", "👍", "👎", "❓", "❌"]
-            for emotes in reaction_emotes:
-                try:
-                    await message.add_reaction(emotes)
-                except discord.NotFound:
-                    return  # No need to log if message was removed
-                except (discord.Forbidden, discord.HTTPException):
-                    self.log.info("Unable to react in {}".format(emote_channel))
+            try:
+                await message.add_reaction("👋")
+            except discord.NotFound:
+                return  # No need to log if message was removed
+            except (discord.Forbidden, discord.HTTPException):
+                self.log.info("Unable to react in {}".format(emote_channel))
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User):
@@ -322,25 +320,50 @@ class Reports(BASECOG):
         if reaction.message.channel != report_channel:
             return
 
-        if (
-            reaction.message.embeds
-            and "Moderator Claimed:" in str(reaction.message.embeds[0].fields)
-            or "has claimed this." in reaction.message.content
-            or not reaction.message.embeds
-        ):
-            return
-
         message = reaction.message
         if message.author.id != self.bot.user.id:
             return
 
-        try:
-            embed = message.embeds[0]
-            embed.add_field(
-                name="Moderator Claimed:", value="{} ({})".format(user.mention, user.id)
-            )
-            await message.edit(embed=embed)
-        except IndexError:
-            await message.edit("{} ({}) has claimed this.".format(user.mention, user.id))
+        if (
+            reaction.message.embeds
+            and "Status:" in str(reaction.message.embeds[0].fields)
+            or "has marked this resolved." in reaction.message.content
+            or "has marked this invalid." in reaction.message.content
+            or not reaction.message.embeds
+        ):
+            return
+
+        if reaction.emoji == "👋":
+            try:
+                embed = message.embeds[0]
+                embed.add_field(
+                    name="Moderator Claimed:", value="{} ({})".format(user.mention, user.id)
+                )
+                await message.edit(embed=embed)
+                await reaction.clear()
+                await message.add_reaction("👍")
+                await message.add_reaction("👎")
+            except IndexError:
+                await message.edit("{} ({}) has claimed this.".format(user.mention, user.id))
+        elif: reaction.emoji == "👍":
+            try:
+                embed = message.embeds[0]
+                embed.add_field(
+                    name="Status:", value="✅ Resolved"
+                )
+                await message.edit(embed=embed)
+                await message.clear_reactions()
+            except IndexError:
+                await message.edit("{} ({}) has marked this resolved.".format(user.mention, user.id))
+        elif: reaction.emoji == "👎":
+            try:
+                embed = message.embeds[0]
+                embed.add_field(
+                    name="Status:", value="❎ Invalid"
+                )
+                await message.edit(embed=embed)
+                await message.clear_reactions()
+            except IndexError:
+                await message.edit("{} ({}) has marked this invalid.".format(user.mention, user.id))
 
     # Reason for no try on editing is because we check if it's the bot's message before editing
