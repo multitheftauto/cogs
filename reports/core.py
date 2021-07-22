@@ -376,7 +376,7 @@ class Reports(BASECOG):
                     channel_archive = self.bot.get_channel(config_info["archive_channel"])
                     try:
                         await channel_archive.send(embed=embed)
-                        await ssage.delete()
+                        await message.delete()
                     except discord.Forbidden:
                         self.log.warning("Unable to send message in {}".format(channel_archive))
                     except discord.HTTPException as e:
@@ -395,7 +395,7 @@ class Reports(BASECOG):
                     channel_archive = self.bot.get_channel(config_info["archive_channel"])
                     try:
                         await channel_archive.send(embed=embed)
-                        await ssage.delete()
+                        await message.delete()
                     except discord.Forbidden:
                         self.log.warning("Unable to send message in {}".format(channel_archive))
                     except discord.HTTPException as e:
