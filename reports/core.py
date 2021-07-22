@@ -7,6 +7,7 @@ from redbot.core import Config, checks, commands
 BASECOG = getattr(commands, "Cog", object)
 DEF_GUILD = {
     "report_channel": None,
+    "archive_channel": None,
     "emote_reactions": False,
     "claim_reports": False,
     "recieve_dms": [],
@@ -192,6 +193,7 @@ class Reports(BASECOG):
         """
         guild_config = await self.config.guild(ctx.guild).all()
         report_channel = guild_config["report_channel"]
+        archive_channel = guild_config["archive_channel"]
         emotes_toggle = guild_config["emote_reactions"]
         claim_toggle = guild_config["claim_reports"]
 
@@ -200,6 +202,11 @@ class Reports(BASECOG):
         embed.add_field(
             name="Report Channel",
             value="<#{}>".format(report_channel) if report_channel else "No channel set",
+            inline=False,
+        )
+        embed.add_field(
+            name="Archive Channel",
+            value="<#{}>".format(archive_channel) if archive_channel else "No channel set",
             inline=False,
         )
         embed.add_field(
@@ -239,6 +246,18 @@ class Reports(BASECOG):
 
         await self.config.guild(ctx.guild).report_channel.set(channel.id)
         await ctx.send("Done. Set {} to be the report channel.".format(channel.mention))
+
+    @reportset.command()
+    async def archive(self, ctx, channel: Optional[discord.TextChannel]):
+        """
+        Sets the channel where reports will archived into
+        """
+        if channel is None:
+            await self.config.guild(ctx.guild).archive_channel.set(None)
+            return await ctx.send("Done. Cleared the archive channel.")
+
+        await self.config.guild(ctx.guild).archive_channel.set(channel.id)
+        await ctx.send("Done. Set {} to be the archive channel.".format(channel.mention))
 
     @reportset.command()
     async def emotes(self, ctx, toggle: Optional[bool]):
@@ -353,6 +372,15 @@ class Reports(BASECOG):
                 )
                 await message.edit(embed=embed)
                 await message.clear_reactions()
+                if config_info["archive_channel"]:
+                    channel_archive = self.bot.get_channel(config_info["archive_channel"])
+                    try:
+                        await channel_archive.send(embed=embed)
+                        await ssage.delete()
+                    except discord.Forbidden:
+                        self.log.warning("Unable to send message in {}".format(channel_archive))
+                    except discord.HTTPException as e:
+                        self.log.warning("HTTPException {} - {}".format(e.code, e.status))
             except IndexError:
                 await message.edit("{} ({}) has marked this resolved.".format(user.mention, user.id))
         elif reaction.emoji == "👎":
@@ -363,6 +391,15 @@ class Reports(BASECOG):
                 )
                 await message.edit(embed=embed)
                 await message.clear_reactions()
+                if config_info["archive_channel"]:
+                    channel_archive = self.bot.get_channel(config_info["archive_channel"])
+                    try:
+                        await channel_archive.send(embed=embed)
+                        await ssage.delete()
+                    except discord.Forbidden:
+                        self.log.warning("Unable to send message in {}".format(channel_archive))
+                    except discord.HTTPException as e:
+                        self.log.warning("HTTPException {} - {}".format(e.code, e.status))
             except IndexError:
                 await message.edit("{} ({}) has marked this invalid.".format(user.mention, user.id))
 
