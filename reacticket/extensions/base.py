@@ -129,7 +129,7 @@ class ReacTicketBaseMixin(MixinMeta):
                 #     if user:
                 #         overwrites[user] = discord.PermissionOverwrite(read_messages=False)
                 # await channel.edit(category=archive, overwrites=overwrites)
-                await channel.move(category=archive)
+                await channel.move(category=archive, beginning=True, sync_permissions=True, reason="Ticket archive")
             except discord.HTTPException as e:
                 await destination.send(f"Failed to move to archive: {str(e)}")
         else:
