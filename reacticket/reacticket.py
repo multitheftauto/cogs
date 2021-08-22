@@ -246,37 +246,37 @@ class ReacTicket(
         for channel, added_users in post_processing.items():
             if guild_settings["archive"]["enabled"] and channel and archive:
                 try:
-                    admin_roles = [
-                        member.guild.get_role(role_id)
-                        for role_id in (await self.bot._config.guild(member.guild).admin_role())
-                        if member.guild.get_role(role_id)
-                    ]
-                    support_roles = [
-                        member.guild.get_role(role_id)
-                        for role_id in guild_settings["supportroles"]
-                        if member.guild.get_role(role_id)
-                    ]
+                    # admin_roles = [
+                    #     member.guild.get_role(role_id)
+                    #     for role_id in (await self.bot._config.guild(member.guild).admin_role())
+                    #     if member.guild.get_role(role_id)
+                    # ]
+                    # support_roles = [
+                    #     member.guild.get_role(role_id)
+                    #     for role_id in guild_settings["supportroles"]
+                    #     if member.guild.get_role(role_id)
+                    # ]
 
-                    all_roles = admin_roles + support_roles
-                    overwrites = {
-                        member.guild.default_role: discord.PermissionOverwrite(
-                            read_messages=False
-                        ),
-                        member.guild.me: discord.PermissionOverwrite(
-                            read_messages=True,
-                            send_messages=True,
-                            manage_channels=True,
-                            manage_permissions=True,
-                        ),
-                    }
-                    for role in all_roles:
-                        overwrites[role] = discord.PermissionOverwrite(
-                            read_messages=True, send_messages=True
-                        )
-                    for user in added_users:
-                        if user:
-                            overwrites[user] = discord.PermissionOverwrite(read_messages=False)
-                    await channel.edit(category=archive, overwrites=overwrites)
+                    # all_roles = admin_roles + support_roles
+                    # overwrites = {
+                    #     member.guild.default_role: discord.PermissionOverwrite(
+                    #         read_messages=False
+                    #     ),
+                    #     member.guild.me: discord.PermissionOverwrite(
+                    #         read_messages=True,
+                    #         send_messages=True,
+                    #         manage_channels=True,
+                    #         manage_permissions=True,
+                    #     ),
+                    # }
+                    # for role in all_roles:
+                    #     overwrites[role] = discord.PermissionOverwrite(
+                    #         read_messages=True, send_messages=True
+                    #     )
+                    # for user in added_users:
+                    #     if user:
+                    #         overwrites[user] = discord.PermissionOverwrite(read_messages=False)
+                    await channel.move(category=archive)
                 except discord.HTTPException as e:
                     await channel.send(f"Failed to move to archive: {str(e)}")
             else:
@@ -355,31 +355,31 @@ class ReacTicket(
                 await message.remove_reaction(payload.emoji, member=user)
             return
 
-        admin_roles = [
-            guild.get_role(role_id)
-            for role_id in (await self.bot._config.guild(guild).admin_role())
-            if guild.get_role(role_id)
-        ]
-        support_roles = [
-            guild.get_role(role_id)
-            for role_id in (await self.config.guild(guild).supportroles())
-            if guild.get_role(role_id)
-        ]
+        # admin_roles = [
+        #     guild.get_role(role_id)
+        #     for role_id in (await self.bot._config.guild(guild).admin_role())
+        #     if guild.get_role(role_id)
+        # ]
+        # support_roles = [
+        #     guild.get_role(role_id)
+        #     for role_id in (await self.config.guild(guild).supportroles())
+        #     if guild.get_role(role_id)
+        # ]
 
-        all_roles = admin_roles + support_roles
+        # all_roles = admin_roles + support_roles
 
-        can_read = discord.PermissionOverwrite(read_messages=True, send_messages=True)
-        can_read_and_manage = discord.PermissionOverwrite(
-            read_messages=True, send_messages=True, manage_channels=True, manage_permissions=True
-        )  # Since Discord can't make up their mind about manage channels/manage permissions
+        # can_read = discord.PermissionOverwrite(read_messages=True, send_messages=True)
+        # can_read_and_manage = discord.PermissionOverwrite(
+        #     read_messages=True, send_messages=True, manage_channels=True, manage_permissions=True
+        # )  # Since Discord can't make up their mind about manage channels/manage permissions
 
-        overwrites = {
-            guild.default_role: discord.PermissionOverwrite(read_messages=False),
-            guild.me: can_read_and_manage,
-            user: can_read,
-        }
-        for role in all_roles:
-            overwrites[role] = can_read
+        # overwrites = {
+        #     guild.default_role: discord.PermissionOverwrite(read_messages=False),
+        #     guild.me: can_read_and_manage,
+        #     user: can_read,
+        # }
+        # for role in all_roles:
+        #     overwrites[role] = can_read
 
         now = datetime.datetime.now(datetime.timezone.utc)
 
@@ -397,7 +397,8 @@ class ReacTicket(
             .replace("{random}", str(random.randint(1, 100000)))
         )[:100]
 
-        created_channel = await category.create_text_channel(channel_name, overwrites=overwrites)
+        # created_channel = await category.create_text_channel(channel_name, overwrites=overwrites)
+        created_channel = await category.create_text_channel(channel_name)
         if guild_settings["openmessage"] == "{default}":
             if guild_settings["usercanclose"]:
                 sent = await created_channel.send(

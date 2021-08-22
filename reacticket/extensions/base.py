@@ -100,35 +100,36 @@ class ReacTicketBaseMixin(MixinMeta):
             await asyncio.sleep(60)
 
             try:
-                admin_roles = [
-                    ctx.guild.get_role(role_id)
-                    for role_id in (await self.bot._config.guild(ctx.guild).admin_role())
-                    if ctx.guild.get_role(role_id)
-                ]
-                support_roles = [
-                    ctx.guild.get_role(role_id)
-                    for role_id in guild_settings["supportroles"]
-                    if ctx.guild.get_role(role_id)
-                ]
+                # admin_roles = [
+                #     ctx.guild.get_role(role_id)
+                #     for role_id in (await self.bot._config.guild(ctx.guild).admin_role())
+                #     if ctx.guild.get_role(role_id)
+                # ]
+                # support_roles = [
+                #     ctx.guild.get_role(role_id)
+                #     for role_id in guild_settings["supportroles"]
+                #     if ctx.guild.get_role(role_id)
+                # ]
 
-                all_roles = admin_roles + support_roles
-                overwrites = {
-                    ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-                    ctx.guild.me: discord.PermissionOverwrite(
-                        read_messages=True,
-                        send_messages=True,
-                        manage_channels=True,
-                        manage_permissions=True,
-                    ),
-                }
-                for role in all_roles:
-                    overwrites[role] = discord.PermissionOverwrite(
-                        read_messages=True, send_messages=True
-                    )
-                for user in added_users:
-                    if user:
-                        overwrites[user] = discord.PermissionOverwrite(read_messages=False)
-                await channel.edit(category=archive, overwrites=overwrites)
+                # all_roles = admin_roles + support_roles
+                # overwrites = {
+                #     ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
+                #     ctx.guild.me: discord.PermissionOverwrite(
+                #         read_messages=True,
+                #         send_messages=True,
+                #         manage_channels=True,
+                #         manage_permissions=True,
+                #     ),
+                # }
+                # for role in all_roles:
+                #     overwrites[role] = discord.PermissionOverwrite(
+                #         read_messages=True, send_messages=True
+                #     )
+                # for user in added_users:
+                #     if user:
+                #         overwrites[user] = discord.PermissionOverwrite(read_messages=False)
+                # await channel.edit(category=archive, overwrites=overwrites)
+                await channel.move(category=archive)
             except discord.HTTPException as e:
                 await destination.send(f"Failed to move to archive: {str(e)}")
         else:
