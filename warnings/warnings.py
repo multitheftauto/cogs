@@ -37,6 +37,8 @@ class Warnings(commands.Cog):
         "show_mod": False,
         "warn_channel": None,
         "toggle_channel": False,
+        "thread_channel": None,
+        "toggle_thread": False,
     }
 
     default_member = {"total_points": 0, "status": "", "warnings": {}}
@@ -167,6 +169,40 @@ class Warnings(commands.Cog):
         else:
             await self.config.guild(guild).warn_channel.set(channel)
             await ctx.send(_("Warnings will now be sent in the channel command was used in."))
+
+    @warningset.command()
+    @commands.guild_only()
+    async def threadchannel(self, ctx: commands.Context, channel: discord.TextChannel = None):
+        """Set the channel where threads should created.
+        Leave empty to use the channel `[p]warn` command was called in.
+        """
+        guild = ctx.guild
+        if channel:
+            await self.config.guild(guild).thread_channel.set(channel.id)
+            await ctx.send(
+                _("The thread channel has been set to {channel}.").format(channel=channel.mention)
+            )
+        else:
+            await self.config.guild(guild).thread_channel.set(channel)
+            await ctx.send(_("Warnings will now be sent in the channel command was used in."))
+
+    @warningset.command()
+    @commands.guild_only()
+    async def usethreads(self, ctx: commands.Context, true_or_false: bool):
+        """
+        Set if warnings should be sent to a channel as a thread set with `[p]warningset threadchannel`.
+        """
+        await self.config.guild(ctx.guild).toggle_thread.set(true_or_false)
+        channel = self.bot.get_channel(await self.config.guild(ctx.guild).thread_channel())
+        if true_or_false:
+            if channel:
+                await ctx.send(
+                    _("Warnings will now be sent as a thread to {channel}.").format(channel=channel.mention)
+                )
+            else:
+                await ctx.send(_("Warnings will now be sent as a thread in the channel command was used in."))
+        else:
+            await ctx.send(_("Toggle thread has been disabled."))
 
     @warningset.command()
     @commands.guild_only()
