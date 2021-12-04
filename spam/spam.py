@@ -78,8 +78,8 @@ class spam(commands.Cog):
         else:
             await ctx.maybe_send_embed("Couldn't resolve the invite.")
 
-    @spam.command()
-    async def channel(self, ctx, channel: discord.TextChannel):
+    @spam.command(name="channel")
+    async def _channel(self, ctx, channel: discord.TextChannel):
         """ Add a channel to whitelist """
         if channel:
             channel_id = str(channel.id)
