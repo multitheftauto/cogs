@@ -118,7 +118,7 @@ class wiki(commands.Cog):
 
             hits["footer"] = soup.find(class_="printfooter").find_next_siblings()
 
-        elif data in ["Serverside event", "Clientside event"]:
+        elif data in ["Server-side event", "Client-side event"]:
             body = list(soup.find(class_="mw-parser-output").findChildren(recursive=False))
             hits = {}
 
