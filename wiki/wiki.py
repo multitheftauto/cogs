@@ -36,9 +36,9 @@ class wiki(commands.Cog):
 
         self.types = [
             "Server-only function",
-            "Serverside event",
+            "Server-side event",
             "Client-only function",
-            "Clientside event",
+            "Client-side event",
             "Shared function",
             "Useful Function"
         ]
@@ -163,12 +163,12 @@ class wiki(commands.Cog):
             p = i
 
         if result:
-            if data == "Clientside event":
+            if data == "Client-side event":
                 name = "Client Event"
                 colour = discord.Colour(0xff0000)
                 title_url = "https://wiki.multitheftauto.com/wiki/Client_Scripting_Events"
                 r_type = "event"
-            elif data == "Serverside event":
+            elif data == "Server-side event":
                 name = "Server Event"
                 colour = discord.Colour(0xe67e22)
                 title_url = "https://wiki.multitheftauto.com/wiki/Server_Scripting_Events"
