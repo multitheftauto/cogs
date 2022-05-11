@@ -74,7 +74,7 @@ class wiki(commands.Cog):
             return self.sanitize("\n".join(result))
 
     async def respond(self, ctx, target, part, soup, data):
-        if data in ["Server-only function", "Client-only function", "Shared function", "Useful Function"]:
+        if data in ["Server-only function", "Client-only function", "Client-side function", "Shared function", "Useful Function"]:
             body = list(soup.find(class_="mw-parser-output").findChildren(recursive=False))
             hits = {}
 
@@ -174,7 +174,7 @@ class wiki(commands.Cog):
                 colour = discord.Colour(0xe67e22)
                 title_url = "https://wiki.multitheftauto.com/wiki/Server_Scripting_Events"
                 r_type = "event"
-            elif data == "Client-only function":
+            elif data == "Client-only function" or data == "Client-side function":
                 name = "Client Function"
                 colour = discord.Colour(0xff0000)
                 title_url = "https://wiki.multitheftauto.com/wiki/Client_Scripting_Functions"
