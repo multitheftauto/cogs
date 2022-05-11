@@ -38,6 +38,7 @@ class wiki(commands.Cog):
             "Server-only function",
             "Server-side event",
             "Client-only function",
+            "Client-side function",
             "Client-side event",
             "Shared function",
             "Useful Function"
