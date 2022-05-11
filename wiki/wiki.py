@@ -203,7 +203,7 @@ class wiki(commands.Cog):
                 embed.add_field(name=part_name, value=result[part], inline=False)
             else:
                 if r_type == "function":
-                    embed.add_field(name="Description", value=result["description"], inline=False)
+                    # embed.add_field(name="Description", value=result["description"], inline=False)
                     embed.add_field(name="Syntax", value=result["syntax"], inline=False)
                 else:
                     embed.add_field(name="Parameters", value=result["parameters"], inline=False)
