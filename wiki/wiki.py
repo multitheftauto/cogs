@@ -180,7 +180,7 @@ class wiki(commands.Cog):
                 colour = discord.Colour(0xff0000)
                 title_url = "https://wiki.multitheftauto.com/wiki/Client_Scripting_Functions"
                 r_type = "function"
-            elif data == "Server-only function" or data == "Server-side function",:
+            elif data == "Server-only function" or data == "Server-side function":
                 name = "Server Function"
                 colour = discord.Colour(0xe67e22)
                 title_url = "https://wiki.multitheftauto.com/wiki/Server_Scripting_Functions"
