@@ -302,11 +302,7 @@ class EventMixin:
                     description=_("*Message's content unknown.*"),
                     colour=await self.get_event_colour(guild, "message_delete"),
                 )
-                # add message jumplink to footer
-                embed.set_footer(
-                    text="[Jump to message]({})".format("https://discordapp.com/channels/{}/{}/{}".format(guild.id, channel_id, payload.message_id))
-                )
-                embed.add_field(name=_("Channel"), value=message_channel.mention)
+                embed.add_field(name=_("Channel"), value=message_channel.mention + " - [Jump]({})".format("https://discordapp.com/channels/{}/{}/{}".format(guild.id, channel_id, payload.message_id)))
                 embed.set_author(name=_("Deleted Message"))
                 await channel.send(embed=embed)
             else:
