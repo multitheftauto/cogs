@@ -364,7 +364,7 @@ class EventMixin:
                 emoji=settings["emoji"],
                 time=time.strftime("%H:%M:%S"),
                 author=author,
-                channel=message_channel.mention,
+                channel=message_channel,
                 a_id=author.id,
             )
         else:
@@ -377,7 +377,7 @@ class EventMixin:
                 perp=perp,
                 author=author,
                 a_id=author.id,
-                channel=message_channel.mention,
+                channel=message_channel,
             )
         if embed_links:
             embed = discord.Embed(
