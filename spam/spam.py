@@ -171,13 +171,14 @@ class spam(commands.Cog):
         if find:
             channels = await self.config.guild(ctx.guild).channels()
             if str(ctx.channel.id) not in channels:
+                await ctx.delete()
                 feed = await self.config.guild(ctx.guild).feed()
                 if feed:
                     embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Spam protection deleted an invite (Whitelist) in <#"+str(ctx.channel.id)+">")
                     embed.add_field(name="**Author:**", value="<@"+str(ctx.author.id)+">", inline=False)
                     embed.add_field(name="**Message:**", value=ctx.content, inline=False)
                     await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
-                return await ctx.delete()
+                return
 
             invites = await self.config.guild(ctx.guild).invites()
             for i in find:
