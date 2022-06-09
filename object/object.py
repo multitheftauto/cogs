@@ -57,7 +57,7 @@ class Object(commands.Cog):
             
             # get image
             image = self.image.format(id)
-            embed.set_image(url=image)
+            embed.set_thumbnail(url=image)
             embed.set_footer(text="Requested by: " + ctx.author.name, icon_url=ctx.author.avatar_url)
             await ctx.send(embed=embed)
 
