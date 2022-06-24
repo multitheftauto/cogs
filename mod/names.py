@@ -291,7 +291,7 @@ class ModInfo(MixinMeta):
 
         if await self.bot.is_mod(author):
             advancedlog = Config.get_conf(self, 544974305445019651, cog_name="advancedlog")
-            notes = await advancedlog.member(author).notes()
+            notes = await advancedlog.member(user).notes()
             # If the user has notes, add them to the embed
             if notes:
                 # Enumerate and format the notes
