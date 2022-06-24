@@ -290,7 +290,7 @@ class ModInfo(MixinMeta):
         data.set_thumbnail(url=avatar)
 
         if await self.bot.is_mod(author):
-            advancedlog = Config.get_conf(self, 544974305445019651, True, cog_name="advancedlog")
+            advancedlog = Config.get_conf(self, 544974305445019651, True, cog_name="AdvancedLog")
             notes = await advancedlog.member(user).notes()
             # If the user has notes, add them to the embed
             if notes:
