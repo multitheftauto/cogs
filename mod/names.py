@@ -289,13 +289,14 @@ class ModInfo(MixinMeta):
         data.set_author(name=f"{statusemoji} {name}", url=avatar)
         data.set_thumbnail(url=avatar)
 
-        notes = "testing"
-        if notes:
-            data.add_field(
-                name=_("Mod Notes"),
-                value=notes,
-                inline=False,
-            )
+        if await self.bot.is_mod(author):
+            notes = "testing"
+            if notes:
+                data.add_field(
+                    name=_("Mod Notes"),
+                    value=notes,
+                    inline=False,
+                )
 
         await ctx.send(embed=data)
 
