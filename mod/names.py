@@ -295,10 +295,10 @@ class ModInfo(MixinMeta):
             # If the user has notes, add them to the embed
             if notes:
                 # Enumerate and format the notes
-                notes = "\n".join(f"{i+1}. {n['author']}: {n['note']}" for i, n in enumerate(notes))
+                notes = "\n".join(f"{i+1}. <@{n['author']}>: {n['note']}" for i, n in enumerate(notes))
                 # trim if too long and add ...
                 if len(notes) > 1024:
-                    notes = notes[:1020] + "..."
+                    notes = notes[:990] + "... ([p]notes <user>)"
                 data.add_field(
                     name=_("Mod Notes"),
                     value=notes,
