@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import cast
 
 import discord
-from redbot.core import commands, i18n, checks
+from redbot.core import commands, i18n, checks, Config
 from redbot.core.utils.common_filters import (
     filter_invites,
     filter_various_mentions,
@@ -290,8 +290,15 @@ class ModInfo(MixinMeta):
         data.set_thumbnail(url=avatar)
 
         if await self.bot.is_mod(author):
-            notes = "testing"
+            advancedlog = Config.get_conf(self, 544974305445019651, cog_name="advancedlog")
+            notes = await advancedlog.member(author).notes()
+            # If the user has notes, add them to the embed
             if notes:
+                # Enumerate and format the notes
+                notes = "\n".join(f"{i+1}. {n}" for i, n in enumerate(notes))
+                # trim if too long and add ...
+                if len(notes) > 1024:
+                    notes = notes[:1020] + "..."
                 data.add_field(
                     name=_("Mod Notes"),
                     value=notes,
