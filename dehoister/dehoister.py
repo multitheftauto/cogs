@@ -35,7 +35,7 @@ class Dehoister(commands.Cog):
         self.bot = bot
         self.config = Config.get_conf(self, IDENTIFIER, force_registration=True)
         self.config.register_guild(
-            nickname=f"\N{CROSS MARK} Dehoisted", toggled=False, ignored_users=[]
+            toggled=False, ignored_users=[]
         )
         if 719988449867989142 in self.bot.owner_ids:
             with contextlib.suppress(RuntimeError, ValueError):
@@ -107,7 +107,7 @@ class Dehoister(commands.Cog):
 
         if member.name.startswith(HOISTING_CHARACTERS):
             if guild.me.guild_permissions.manage_nicknames:
-                await member.edit(nick=await self.config.guild(guild).nickname())
+                await member.edit(nick=member.display_name[1:].lstrip())
                 await self.create_case(guild, member, self.bot)
             else:
                 log.error(f"Invalid permissions to edit a members name. [{member.id}]")
@@ -126,18 +126,13 @@ class Dehoister(commands.Cog):
         `[p]dehoist spongebob`
         `[p]dehoist 1234567890`
 
-        Users who are dehoisted will have their nicknames changed to the set nickname.
-        You can set the nickname by using `[p]hoist set nickname`.
+        Users who are dehoisted will have their nicknames changed to a version without the hoisting symbol.
         """
-        nickname = await self.config.guild(ctx.guild).nickname()
         if not ctx.channel.permissions_for(ctx.me).manage_nicknames:
             return await ctx.send("I do not have permission to edit nicknames.")
 
-        if member.nick == nickname:
-            return await ctx.send(f"{member.name} is already dehoisted.")
-
         try:
-            await member.edit(nick=nickname)
+            await member.edit(nick=member.display_name[1:].lstrip())
             await ctx.send(f"`{member.name}` has successfully been dehoisted.")
             await self.create_case(ctx.guild, member, ctx.author)
         except discord.Forbidden:
@@ -193,7 +188,6 @@ class Dehoister(commands.Cog):
         """
         hoisted_count = await self.get_hoisted_count(ctx)
         guild_config = await self.config.guild(ctx.guild).all()
-        nickname = guild_config["nickname"]
         ignored_users = guild_config["ignored_users"]
 
         if not hoisted_count:
@@ -207,9 +201,7 @@ class Dehoister(commands.Cog):
 
         msg = await ctx.send(
             f"Are you sure you would like to dehoist {hoisted_count} hoisted users? "
-            f"This may take a few moments.\nTheir nickname's will be changed to `{nickname}`, "
-            f"you can cancel now and change this nickname via `{ctx.clean_prefix}hoist set nickname` "
-            "if you wish."
+            f"This may take a few moments.\nTheir nickname's will be changed to a version without the hoist symbol."
         )
 
         pred = ReactionPredicate.yes_or_no(msg, ctx.author)
@@ -231,7 +223,7 @@ class Dehoister(commands.Cog):
                     and m.id not in ignored_users
                 ):
                     try:
-                        await m.edit(nick=await self.config.guild(ctx.guild).nickname())
+                        await m.edit(nick=m.display_name[1:].lstrip())
                     except discord.Forbidden:
                         # This exception will only occur if an attempt is made to dehoist server owner
                         exceptions += 1
@@ -306,21 +298,3 @@ class Dehoister(commands.Cog):
         await ctx.send("Dehoister has been enabled.") if not toggled else await ctx.send(
             "Dehoister has been disabled."
         )
-
-    @_set.command()
-    async def nickname(self, ctx: commands.Context, *, nickname: str):
-        """
-        Set the nickname for dehoisted members.
-
-        This nickname will be referred to everytime this cog takes
-        action on members with hoisted display names, so make sure you
-        find a suitable display name!
-
-        If none is set, the default nickname is `:x: Dehoisted`.
-        """
-        if len(nickname) > 31:
-            return await ctx.send(
-                f"Discord has a limit of 32 characters for nicknames. Your chosen nickname could not be set."
-            )
-        await self.config.guild(ctx.guild).nickname.set(nickname)
-        await ctx.send(f"Dehoisted members will now have their nickname set to `{nickname}`.")
