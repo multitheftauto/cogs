@@ -3,17 +3,17 @@ msgstr ""
 "Project-Id-Version: red-discordbot\n"
 "POT-Creation-Date: 2022-04-03 01:21+0000\n"
 "Last-Translator: \n"
-"Language-Team: Swedish\n"
+"Language-Team: Slovenian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: redgettext 3.4.2\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n%100==4 ? 3 : 0);\n"
 "X-Crowdin-Project: red-discordbot\n"
 "X-Crowdin-Project-ID: 289505\n"
-"X-Crowdin-Language: sv-SE\n"
+"X-Crowdin-Language: sl\n"
 "X-Crowdin-File-ID: 34\n"
-"Language: sv_SE\n"
+"Language: sl_SI\n"
 
 #: redbot/cogs/mod/events.py:56 redbot/cogs/mod/events.py:71
 msgid "Mention spam (Autoban)"
@@ -299,7 +299,7 @@ msgstr ""
 
 #: redbot/cogs/mod/kickban.py:899
 msgid "It seems that user isn't banned!"
-msgstr "Det verkar som att användaren inte är bannlyst!"
+msgstr ""
 
 #: redbot/cogs/mod/kickban.py:904
 msgid "Something went wrong while attempting to unban that user."
@@ -389,7 +389,7 @@ msgstr ""
 
 #: redbot/cogs/mod/names.py:81
 msgid "Done."
-msgstr "Klart."
+msgstr ""
 
 #: redbot/cogs/mod/names.py:92
 msgid "Custom: {emoji} {name}"
@@ -447,7 +447,7 @@ msgstr ""
 
 #: redbot/cogs/mod/names.py:230
 msgid "Chilling in {} status"
-msgstr "Chillar i {} status"
+msgstr ""
 
 #: redbot/cogs/mod/names.py:243
 msgid "and {numeric_number} more roles not displayed due to embed limits."
@@ -455,15 +455,15 @@ msgstr ""
 
 #: redbot/cogs/mod/names.py:270
 msgid "Joined Discord on"
-msgstr "Gick med i Discord den"
+msgstr ""
 
 #: redbot/cogs/mod/names.py:271
 msgid "Joined this server on"
-msgstr "Gick med i denna server den"
+msgstr ""
 
 #: redbot/cogs/mod/names.py:274
 msgid "Roles"
-msgstr "Roller"
+msgstr ""
 
 #: redbot/cogs/mod/names.py:274
 msgid "Role"
@@ -491,7 +491,7 @@ msgstr ""
 
 #: redbot/cogs/mod/names.py:298
 msgid "Member #{} | User ID: {}"
-msgstr "Medlem #{} | User ID: {}"
+msgstr ""
 
 #: redbot/cogs/mod/names.py:312
 #, docstring
@@ -528,7 +528,7 @@ msgstr ""
 #: redbot/cogs/mod/settings.py:83 redbot/cogs/mod/settings.py:91
 #: redbot/cogs/mod/settings.py:94
 msgid "Yes"
-msgstr "Ja"
+msgstr ""
 
 #: redbot/cogs/mod/settings.py:32 redbot/cogs/mod/settings.py:55
 #: redbot/cogs/mod/settings.py:60 redbot/cogs/mod/settings.py:65
@@ -593,7 +593,7 @@ msgstr ""
 
 #: redbot/cogs/mod/settings.py:88
 msgid "None"
-msgstr "Inget"
+msgstr ""
 
 #: redbot/cogs/mod/settings.py:90
 msgid "Reinvite on unban: {yes_or_no}\n"
