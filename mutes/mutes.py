@@ -284,11 +284,10 @@ class Mutes(VoiceMutes, commands.Cog, metaclass=CompositeMetaClass):
         member = guild.get_member(data["member"])
         author = guild.get_member(data["author"])
         if not member:
-            ### Don't remove the mute, so it can persist on rejoin
-            # async with self.config.guild(guild).muted_users() as muted_users:
-            #     if str(data["member"]) in muted_users:
-            #         del muted_users[str(data["member"])]
-            # del self._server_mutes[guild.id][data["member"]]
+            async with self.config.guild(guild).muted_users() as muted_users:
+                if str(data["member"]) in muted_users:
+                    del muted_users[str(data["member"])]
+            del self._server_mutes[guild.id][data["member"]]
             return
         success = await self.unmute_user(guild, author, member, _("Automatic unmute"))
         async with self.config.guild(guild).muted_users() as muted_users:
@@ -457,15 +456,14 @@ class Mutes(VoiceMutes, commands.Cog, metaclass=CompositeMetaClass):
         member = channel.guild.get_member(data["member"])
         author = channel.guild.get_member(data["author"])
         if not member:
-            ### Don't remove the mute, so it can persist on rejoin
-            # async with self.config.channel(channel).muted_users() as muted_users:
-            #     if str(data["member"]) in muted_users:
-            #         del muted_users[str(data["member"])]
-            # if (
-            #     channel.id in self._channel_mutes
-            #     and data["member"] in self._channel_mutes[channel.id]
-            # ):
-            #     del self._channel_mutes[channel.id][data["member"]]
+            async with self.config.channel(channel).muted_users() as muted_users:
+                if str(data["member"]) in muted_users:
+                    del muted_users[str(data["member"])]
+            if (
+                channel.id in self._channel_mutes
+                and data["member"] in self._channel_mutes[channel.id]
+            ):
+                del self._channel_mutes[channel.id][data["member"]]
             return None
         success = await self.channel_unmute_user(
             channel.guild, channel, author, member, _("Automatic unmute")
