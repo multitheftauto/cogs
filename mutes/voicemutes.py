@@ -1,10 +1,11 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 from datetime import timezone, timedelta, datetime
 from .abc import MixinMeta
 
 import discord
-from redbot.core import commands, i18n, modlog
+from redbot.core import commands, checks, i18n, modlog
 from redbot.core.utils.chat_formatting import (
+    bold,
     humanize_timedelta,
     humanize_list,
     pagify,
@@ -123,7 +124,7 @@ class VoiceMutes(MixinMeta):
                 audit_reason = get_audit_reason(author, reason, shorten=True)
 
                 success = await self.channel_mute_user(
-                    guild, channel, author, user, until, audit_reason, voice_mute=True
+                    guild, channel, author, user, until, audit_reason
                 )
 
                 if success["success"]:
@@ -134,7 +135,7 @@ class VoiceMutes(MixinMeta):
                     await modlog.create_case(
                         self.bot,
                         guild,
-                        ctx.message.created_at,
+                        ctx.message.created_at.replace(tzinfo=timezone.utc),
                         "vmute",
                         user,
                         author,
@@ -199,7 +200,7 @@ class VoiceMutes(MixinMeta):
                 audit_reason = get_audit_reason(author, reason, shorten=True)
 
                 success = await self.channel_unmute_user(
-                    guild, channel, author, user, audit_reason, voice_mute=True
+                    guild, channel, author, user, audit_reason
                 )
 
                 if success["success"]:
@@ -210,7 +211,7 @@ class VoiceMutes(MixinMeta):
                     await modlog.create_case(
                         self.bot,
                         guild,
-                        ctx.message.created_at,
+                        ctx.message.created_at.replace(tzinfo=timezone.utc),
                         "vunmute",
                         user,
                         author,
