@@ -650,7 +650,6 @@ class Mutes(VoiceMutes, commands.Cog, metaclass=CompositeMetaClass):
                 )
         if should_save:
             await self.config.guild(guild).muted_users.set(self._server_mutes[guild.id])
-        asyncio.create_task(self.check_channel_mutes(after))
 
     async def check_channel_mutes(self, member: discord.Member):
         async with aiosqlite.connect(self.db_path) as db:
