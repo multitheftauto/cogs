@@ -1,0 +1,6 @@
+{
+    "author" : ["Cog Creators"],
+    "name" : "mutes",
+    "description" : "Copy of Redbot's mutes cog with custom changes",
+    "requirements": ["aiosqlite"]
+}

@@ -2,6 +2,7 @@ import asyncio
 import contextlib
 import discord
 import logging
+import aiosqlite
 
 from abc import ABC
 from typing import cast, Optional, Dict, List, Tuple, Literal, Union
@@ -11,7 +12,7 @@ from .converters import MuteTime
 from .voicemutes import VoiceMutes
 
 from redbot.core.bot import Red
-from redbot.core import commands, checks, i18n, modlog, Config
+from redbot.core import commands, checks, i18n, modlog, Config, data_manager
 from redbot.core.utils import AsyncIter, bounded_gather
 from redbot.core.utils.chat_formatting import (
     bold,
@@ -108,6 +109,8 @@ class Mutes(VoiceMutes, commands.Cog, metaclass=CompositeMetaClass):
         # to wait for a guild to finish channel unmutes before
         # checking for manual overwrites
 
+        self.db_path = data_manager.cog_data_path(self) / "mutes.db"
+
         self._init_task = asyncio.create_task(self._initialize())
 
     async def red_delete_data_for_user(
@@ -149,6 +152,12 @@ class Mutes(VoiceMutes, commands.Cog, metaclass=CompositeMetaClass):
                 self._channel_mutes[c_id][int(user_id)] = mute
         self._unmute_task = asyncio.create_task(self._handle_automatic_unmute())
         self._ready.set()
+        
+        async with aiosqlite.connect(self.db_path) as db:
+            await db.execute("CREATE TABLE IF NOT EXISTS global_mutes (user_id INTEGER NOT NULL PRIMARY KEY, author_id INTEGER, guild_id INTEGER, until INTEGER, reason TEXT)")
+            await db.execute("CREATE TABLE IF NOT EXISTS channel_mutes (user_id INTEGER NOT NULL, author_id INTEGER, channel_id INTEGER NOT NULL, guild_id INTEGER, until INTEGER, reason TEXT)")
+            await db.execute("CREATE INDEX IF NOT EXISTS idx_cmuid ON channel_mutes (user_id)")
+            await db.commit()
 
     async def _maybe_update_config(self):
         schema_version = await self.config.schema_version()
@@ -641,6 +650,27 @@ class Mutes(VoiceMutes, commands.Cog, metaclass=CompositeMetaClass):
                 )
         if should_save:
             await self.config.guild(guild).muted_users.set(self._server_mutes[guild.id])
+        asyncio.create_task(self.check_channel_mutes(after))
+
+    async def check_channel_mutes(self, member: discord.Member):
+        async with aiosqlite.connect(self.db_path) as db:
+            async with db.execute("SELECT * FROM channel_mutes WHERE user_id = ?", (member.id,)) as cursor:
+                rows = await cursor.fetchall()
+                for row in rows:
+                    data = {
+                        "author_id": row[1],
+                        "channel_id": row[2],
+                        "guild_id": row[3],
+                        "until": row[4],
+                        "reason": row[5],
+                    }
+                    time_to_unmute = (data["until"] - datetime.now(timezone.utc).timestamp())
+                    if time_to_unmute > 0:
+                        guild = self.bot.get_guild(data["guild_id"])
+                        await self.channel_mute_user(guild, self.bot.get_channel(data["channel_id"]), guild.get_member(data["author_id"]), guild.get_member(member.id), datetime.fromtimestamp(data["until"]), data["reason"])
+                    else:
+                        await db.execute("DELETE FROM channel_mutes WHERE user_id = ? AND channel_id = ?", (member.id, data["channel_id"]))
+                        await db.commit()
 
     @commands.Cog.listener()
     async def on_guild_channel_update(
@@ -743,6 +773,25 @@ class Mutes(VoiceMutes, commands.Cog, metaclass=CompositeMetaClass):
                 await self.mute_user(
                     guild, guild.me, member, until, _("Previously muted in this server.")
                 )
+        async with aiosqlite.connect(self.db_path) as db:
+            async with db.execute("SELECT * FROM global_mutes WHERE user_id = ?", (member.id,)) as cursor:
+                row = await cursor.fetchone()
+                if row:
+                    data = {
+                        "user_id": row[0],
+                        "author_id": row[1],
+                        "guild_id": row[2],
+                        "until": row[3],
+                        "reason": row[4],
+                    }
+                    time_to_unmute = (data["until"] - datetime.now(timezone.utc).timestamp())
+                    if time_to_unmute > 0:
+                        this_guild = self.bot.get_guild(data["guild_id"])
+                        await self.mute_user(this_guild, this_guild.get_member(data["author_id"]), this_guild.get_member(member.id), datetime.fromtimestamp(data["until"]), data["reason"])
+                    else:
+                        await db.execute("DELETE FROM global_mutes WHERE user_id = ?", (member.id))
+                        await db.commit()
+        asyncio.create_task(self.check_channel_mutes(member))
 
     @commands.group()
     @commands.guild_only()
@@ -1545,11 +1594,14 @@ class Mutes(VoiceMutes, commands.Cog, metaclass=CompositeMetaClass):
             self._server_mutes[guild.id][user.id] = {
                 "author": author.id,
                 "member": user.id,
-                "until": until.timestamp() if until else None,
+                "until": until.timestamp() if until else 0,
             }
             try:
                 await user.add_roles(role, reason=reason)
                 await self.config.guild(guild).muted_users.set(self._server_mutes[guild.id])
+                async with aiosqlite.connect(self.db_path) as db:
+                    await db.execute("INSERT INTO global_mutes (user_id, author_id, guild_id, until, reason) VALUES (?, ?, ?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET author_id = ?, until = ?, reason = ?", (user.id, author.id, guild.id, until.timestamp() if until else 0, reason, author.id, until.timestamp() if until else 0, reason if reason else ""))
+                    await db.commit()
             except discord.errors.Forbidden:
                 if guild.id in self._server_mutes and user.id in self._server_mutes[guild.id]:
                     del self._server_mutes[guild.id][user.id]
@@ -1609,6 +1661,9 @@ class Mutes(VoiceMutes, commands.Cog, metaclass=CompositeMetaClass):
             if guild.id in self._server_mutes:
                 if user.id in self._server_mutes[guild.id]:
                     del self._server_mutes[guild.id][user.id]
+                    async with aiosqlite.connect(self.db_path) as db:
+                        await db.execute("DELETE FROM global_mutes WHERE user_id = ?", (user.id))
+                        await db.commit()
             if not guild.me.guild_permissions.manage_roles or role >= guild.me.top_role:
                 ret["reason"] = _(MUTE_UNMUTE_ISSUES["permissions_issue_role"])
                 return ret
@@ -1630,6 +1685,9 @@ class Mutes(VoiceMutes, commands.Cog, metaclass=CompositeMetaClass):
                 else:
                     ret["success"] = True
             await self.config.member(user).clear()
+            async with aiosqlite.connect(self.db_path) as db:
+                await db.execute("DELETE FROM global_mutes WHERE user_id = ?", (user.id))
+                await db.commit()
             return ret
 
     async def channel_mute_user(
@@ -1689,12 +1747,15 @@ class Mutes(VoiceMutes, commands.Cog, metaclass=CompositeMetaClass):
             "author": author.id,
             "guild": guild.id,
             "member": user.id,
-            "until": until.timestamp() if until else None,
+            "until": until.timestamp() if until else 0,
         }
         try:
             await channel.set_permissions(user, overwrite=overwrites, reason=reason)
             async with self.config.channel(channel).muted_users() as muted_users:
                 muted_users[str(user.id)] = self._channel_mutes[channel.id][user.id]
+            async with aiosqlite.connect(self.db_path) as db:
+                await db.execute("INSERT INTO channel_mutes (user_id, author_id, channel_id, guild_id, until, reason) VALUES (?, ?, ?, ?, ?, ?)", (user.id, author.id, channel.id, guild.id, until.timestamp() if until else 0, reason if reason else ""))
+                await db.commit()
         except discord.NotFound as e:
             if channel.id in self._channel_mutes and user.id in self._channel_mutes[channel.id]:
                 del self._channel_mutes[channel.id][user.id]
@@ -1772,6 +1833,9 @@ class Mutes(VoiceMutes, commands.Cog, metaclass=CompositeMetaClass):
         overwrites.update(**old_values)
         if channel.id in self._channel_mutes and user.id in self._channel_mutes[channel.id]:
             del self._channel_mutes[channel.id][user.id]
+            async with aiosqlite.connect(self.db_path) as db:
+                await db.execute("DELETE FROM channel_mutes WHERE user_id = ? AND channel_id = ?", (user.id, channel.id))
+                await db.commit()
         else:
             return {
                 "success": False,
