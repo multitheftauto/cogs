@@ -182,7 +182,7 @@ class Forward(commands.Cog):
             await user.send(embed=em)
         except discord.Forbidden:
             await ctx.send(
-                "Oops. I couldn't deliver your message to {}. They most likely have me blocked or DMs closed!".format(
+                "Oops. I couldn't deliver your message to {}. They most likely have me blocked or DMs closed! <:MericCat_Sad:708496009327542323>".format(
                     user)
             )
         em = discord.Embed(colour=discord.Colour.green(
