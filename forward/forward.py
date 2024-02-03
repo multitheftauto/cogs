@@ -3,12 +3,15 @@ from redbot.core import commands, checks, Config
 import discord
 import uuid
 from .converters import MuteTime
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
+import asyncio
+import logging
 
-from typing import Optional
+from typing import Optional, Dict
 
 # trans = Translator()
 
+log = logging.getLogger("red.cogs.forward")
 
 class Forward(commands.Cog):
     """Forward messages sent to the bot to the bot owner or in a specified channel."""
@@ -30,6 +33,29 @@ class Forward(commands.Cog):
         self.config.register_global(**default_global)
 
         self.welcome = {}
+
+        self._unblock_task = asyncio.create_task(self._handle_automatic_unblock())
+
+    def cog_unload(self):
+        self._unblock_task.cancel()
+
+    async def _handle_automatic_unblock(self):
+        """This is the core task creator and loop
+        for automatic unblocks
+        """
+        await self.bot.wait_until_red_ready()
+        while True:
+            try:
+                await self._process_expired_blocks()
+            except Exception:
+                log.error("Error checking bot unblocks", exc_info=True)
+            await asyncio.sleep(60) # 60 seconds
+
+    async def _process_expired_blocks(self):
+        async with self.config.blocked() as blocked:
+            for userid, until in blocked:
+                if datetime.now(timezone.utc).timestamp() > until:
+                    del blocked[userid]
 
     async def _destination(self, msg: str = None, embed: discord.Embed = None):
         await self.bot.wait_until_ready()
