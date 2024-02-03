@@ -255,7 +255,7 @@ class Forward(commands.Cog):
     @commands.guild_only()
     @checks.guildowner()
     async def tunblock(self, ctx, user: discord.Member):
-        """Blocks a member from sending dm
+        """Unblocks a member from sending dm
         """
         async with self.config.blocked() as blocked:
             userid = str(user.id)
