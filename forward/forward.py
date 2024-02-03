@@ -46,15 +46,16 @@ class Forward(commands.Cog):
         await self.bot.wait_until_red_ready()
         while True:
             try:
-                async with self.config.blocked() as blocked:
-                    for userid, until in blocked:
-                        now = datetime.now(timezone.utc).timestamp()
-                        log.debug("Checking if {} should be unblocked. Now: {}, Until: {}".format(userid, now, until))
-                        if now > until:
-                            del blocked[userid]
+                await self._process_expired_blocks()
             except Exception:
                 log.error("Error checking bot unblocks", exc_info=True)
             await asyncio.sleep(60) # 60 seconds
+
+    async def _process_expired_blocks(self):
+        async with self.config.blocked() as blocked:
+            for userid, until in blocked.items():
+                if datetime.now(timezone.utc).timestamp() > until:
+                    del blocked[userid]
 
     async def _destination(self, msg: str = None, embed: discord.Embed = None):
         await self.bot.wait_until_ready()
