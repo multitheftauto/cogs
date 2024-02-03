@@ -32,16 +32,16 @@ _ = i18n.Translator("Forward", __file__)
 def str_to_timedelta(
     duration: str
 ) -> Dict[str, Union[timedelta, str, None]]:
-    time_split = TIME_SPLIT.split(argument)
+    time_split = TIME_SPLIT.split(duration)
     result: Dict[str, Union[timedelta, str, None]] = {}
     if time_split:
         maybe_time = time_split[-1]
     else:
-        maybe_time = argument
+        maybe_time = duration
 
     time_data = {}
     for time in TIME_RE.finditer(maybe_time):
-        argument = argument.replace(time[0], "")
+        duration = duration.replace(time[0], "")
         for k, v in time.groupdict().items():
             if v:
                 time_data[k] = int(v)
@@ -52,5 +52,5 @@ def str_to_timedelta(
             raise commands.BadArgument(
                 _("The time provided is too long; use a more reasonable time.")
             )
-    result["reason"] = argument.strip()
+    result["reason"] = duration.strip()
     return result
