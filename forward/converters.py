@@ -27,37 +27,30 @@ TIME_RE_STRING = r"|".join(
 TIME_RE = re.compile(TIME_RE_STRING, re.I)
 TIME_SPLIT = re.compile(r"t(?:ime)?=")
 
-_ = i18n.Translator("Mutes", __file__)
+_ = i18n.Translator("Forward", __file__)
 
+def str_to_timedelta(
+    duration: str
+) -> Dict[str, Union[timedelta, str, None]]:
+    time_split = TIME_SPLIT.split(argument)
+    result: Dict[str, Union[timedelta, str, None]] = {}
+    if time_split:
+        maybe_time = time_split[-1]
+    else:
+        maybe_time = argument
 
-class MuteTime(Converter):
-    """
-    This will parse my defined multi response pattern and provide usable formats
-    to be used in multiple reponses
-    """
-
-    async def convert(
-        self, duration: str
-    ) -> Dict[str, Union[timedelta, str, None]]:
-        time_split = TIME_SPLIT.split(argument)
-        result: Dict[str, Union[timedelta, str, None]] = {}
-        if time_split:
-            maybe_time = time_split[-1]
-        else:
-            maybe_time = argument
-
-        time_data = {}
-        for time in TIME_RE.finditer(maybe_time):
-            argument = argument.replace(time[0], "")
-            for k, v in time.groupdict().items():
-                if v:
-                    time_data[k] = int(v)
-        if time_data:
-            try:
-                result["duration"] = timedelta(**time_data)
-            except OverflowError:
-                raise commands.BadArgument(
-                    _("The time provided is too long; use a more reasonable time.")
-                )
-        result["reason"] = argument.strip()
-        return result
+    time_data = {}
+    for time in TIME_RE.finditer(maybe_time):
+        argument = argument.replace(time[0], "")
+        for k, v in time.groupdict().items():
+            if v:
+                time_data[k] = int(v)
+    if time_data:
+        try:
+            result["duration"] = timedelta(**time_data)
+        except OverflowError:
+            raise commands.BadArgument(
+                _("The time provided is too long; use a more reasonable time.")
+            )
+    result["reason"] = argument.strip()
+    return result
