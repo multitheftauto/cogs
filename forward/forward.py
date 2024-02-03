@@ -270,13 +270,13 @@ class Forward(commands.Cog):
     @commands.command()
     @commands.guild_only()
     @checks.guildowner()
-    async def tblock(self, ctx, user: discord.Member, time: Optional[MuteTime] = "5d"):
+    async def tblock(self, ctx, user: discord.Member, time: Optional[MuteTime] = None):
         """Blocks a member from sending dms to the bot
         """
         async with self.config.blocked() as blocked:
             userid = str(user.id)
             if userid not in blocked:
-                duration = time.get("duration")
+                duration = time.get("duration") if time else MuteTime().convert(ctx, "5d").get("duration")
                 blocked[userid] = (datetime.now(timezone.utc) + duration).timestamp() # until
                 await ctx.maybe_send_embed("Blocked <@{id}> from send messages to the bot until {until}.".format(id=userid, until=datetime.fromtimestamp(blocked[userid])))
             else:
