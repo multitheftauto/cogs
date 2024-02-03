@@ -37,7 +37,7 @@ class MuteTime(Converter):
     """
 
     async def convert(
-        self, ctx: commands.Context, argument: str
+        self, duration: str
     ) -> Dict[str, Union[timedelta, str, None]]:
         time_split = TIME_SPLIT.split(argument)
         result: Dict[str, Union[timedelta, str, None]] = {}

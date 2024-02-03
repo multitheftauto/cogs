@@ -276,7 +276,7 @@ class Forward(commands.Cog):
         async with self.config.blocked() as blocked:
             userid = str(user.id)
             if userid not in blocked:
-                duration = time.get("duration") if time else MuteTime().convert("5d").get("duration")
+                duration = time.get("duration") if time else MuteTime().convert(duration="5d").get("duration")
                 blocked[userid] = (datetime.now(timezone.utc) + duration).timestamp() # until
                 await ctx.maybe_send_embed("Blocked <@{id}> from send messages to the bot until {until}.".format(id=userid, until=datetime.fromtimestamp(blocked[userid])))
             else:
