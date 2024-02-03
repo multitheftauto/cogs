@@ -3,7 +3,7 @@ from redbot.core import commands, checks, Config
 import discord
 import uuid
 from .converters import str_to_timedelta
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import asyncio
 import logging
 
@@ -278,6 +278,7 @@ class Forward(commands.Cog):
             userid = str(user.id)
             if userid not in blocked:
                 duration = str_to_timedelta(duration=time).get("duration")
+                duration = duration if type(duration) is timedelta else str_to_timedelta(duration="5d").get("duration")
                 blocked[userid] = (datetime.now(timezone.utc) + duration).timestamp() # until
                 await ctx.maybe_send_embed("Blocked <@{id}> from sending messages to the bot until {until}.".format(id=userid, until=datetime.fromtimestamp(blocked[userid])))
             else:
