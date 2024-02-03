@@ -3,7 +3,6 @@ from redbot.core import commands, checks, Config
 import discord
 import uuid
 from .converters import MuteTime
-from redbot.core.utils.chat_formatting import humanize_timedelta
 from datetime import datetime, timedelta, timezone
 
 from typing import Optional
@@ -253,9 +252,9 @@ class Forward(commands.Cog):
             if userid not in blocked:
                 duration = time.get("duration") if time else MuteTime("5d").get("duration")
                 blocked[userid] = (datetime.now(timezone.utc) + duration).timestamp() # until
-                await ctx.maybe_send_embed("Blocked <@{id}> from send messages to the bot until {until}.".format(id=userid, until=humanize_timedelta(timedelta=datetime.fromtimestamp(blocked[userid]))))
+                await ctx.maybe_send_embed("Blocked <@{id}> from send messages to the bot until {until}.".format(id=userid, until=datetime.fromtimestamp(blocked[userid])))
             else:
-                await ctx.maybe_send_embed("This user is already blocked until {}.".format(humanize_timedelta(timedelta=datetime.fromtimestamp(blocked[userid]))))
+                await ctx.maybe_send_embed("This user is already blocked until {}.".format(until=datetime.fromtimestamp(blocked[userid])))
 
     @commands.command()
     @commands.guild_only()
@@ -280,7 +279,7 @@ class Forward(commands.Cog):
         async with self.config.blocked() as blocked:
             userid = str(user.id)
             if userid in blocked:
-                await ctx.maybe_send_embed("User <@{id}> is blocked until.".format(id=userid, until=humanize_timedelta(timedelta=datetime.fromtimestamp(blocked[userid]))))
+                await ctx.maybe_send_embed("User <@{id}> is blocked until.".format(id=userid, until=datetime.fromtimestamp(blocked[userid])))
             else:
                 await ctx.maybe_send_embed("This user is not blocked.")
 
