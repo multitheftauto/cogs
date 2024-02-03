@@ -2,6 +2,11 @@ from redbot.core import commands, checks, Config
 # from googletrans import Translator
 import discord
 import uuid
+from .converters import MuteTime
+from redbot.core.utils.chat_formatting import humanize_timedelta
+from datetime import datetime, timedelta, timezone
+
+from typing import Optional
 
 # trans = Translator()
 
@@ -240,28 +245,42 @@ class Forward(commands.Cog):
     @commands.command()
     @commands.guild_only()
     @checks.guildowner()
-    async def tblock(self, ctx, user: discord.Member):
-        """Blocks a member from sending dm
+    async def tblock(self, ctx, user: discord.Member, time: Optional[MuteTime] = None):
+        """Blocks a member from sending dms to the bot
         """
         async with self.config.blocked() as blocked:
             userid = str(user.id)
             if userid not in blocked:
-                blocked[userid] = True
-                await ctx.maybe_send_embed("Blocked <@{}> from send messages to the bot.".format(userid))
+                duration = time.get("duration") if time else MuteTime("5d").get("duration")
+                blocked[userid] = datetime.now(timezone.utc) + duration # until
+                await ctx.maybe_send_embed("Blocked <@{id}> from send messages to the bot until {until}.".format(id=userid, until=humanize_timedelta(timedelta=blocked[userid])))
             else:
-                await ctx.maybe_send_embed("This user is already blocked.")
+                await ctx.maybe_send_embed("This user is already blocked until {}.".format(humanize_timedelta(timedelta=blocked[userid])))
 
     @commands.command()
     @commands.guild_only()
     @checks.guildowner()
     async def tunblock(self, ctx, user: discord.Member):
-        """Unblocks a member from sending dm
+        """Unblocks a member from sending dms
         """
         async with self.config.blocked() as blocked:
             userid = str(user.id)
             if userid in blocked:
                 del blocked[userid]
                 await ctx.maybe_send_embed("Unblocked <@{}> from sending messages to the bot.".format(userid))
+            else:
+                await ctx.maybe_send_embed("This user is not blocked.")
+
+    @commands.command()
+    @commands.guild_only()
+    @checks.guildowner()
+    async def tcheckblock(self, ctx, user: discord.Member):
+        """Checks if a member is blocked from sending dms to the bot
+        """
+        async with self.config.blocked() as blocked:
+            userid = str(user.id)
+            if userid in blocked:
+                await ctx.maybe_send_embed("User <@{id}> is blocked until.".format(id=userid, until=humanize_timedelta(timedelta=blocked[userid])))
             else:
                 await ctx.maybe_send_embed("This user is not blocked.")
 
