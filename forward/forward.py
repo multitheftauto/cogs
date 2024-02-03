@@ -53,7 +53,8 @@ class Forward(commands.Cog):
 
     async def _process_expired_blocks(self):
         async with self.config.blocked() as blocked:
-            for userid, until in blocked.items():
+            for userid in list(blocked.keys()):
+                until = blocked[userid]
                 if datetime.now(timezone.utc).timestamp() > until:
                     del blocked[userid]
 
