@@ -14,7 +14,7 @@ from typing import Optional, Dict
 log = logging.getLogger("red.cogs.forward")
 
 class Forward(commands.Cog):
-    """Forward messages sent to the bot to the bot owner or in a specified channel."""
+    """Forward messages sent to the bot to the bot owner or a specified channel."""
 
     __version__ = "1.2.5"
 
@@ -272,14 +272,14 @@ class Forward(commands.Cog):
     @commands.guild_only()
     @checks.guildowner()
     async def tblock(self, ctx, user: discord.Member, time: Optional[str] = "5d"):
-        """Blocks a member from sending dms to the bot
+        """Blocks a member from sending DMs to the bot
         """
         async with self.config.blocked() as blocked:
             userid = str(user.id)
             if userid not in blocked:
                 duration = str_to_timedelta(duration=time).get("duration")
                 blocked[userid] = (datetime.now(timezone.utc) + duration).timestamp() # until
-                await ctx.maybe_send_embed("Blocked <@{id}> from send messages to the bot until {until}.".format(id=userid, until=datetime.fromtimestamp(blocked[userid])))
+                await ctx.maybe_send_embed("Blocked <@{id}> from sending messages to the bot until {until}.".format(id=userid, until=datetime.fromtimestamp(blocked[userid])))
             else:
                 await ctx.maybe_send_embed("This user is already blocked until {}.".format(datetime.fromtimestamp(blocked[userid])))
 
@@ -293,7 +293,7 @@ class Forward(commands.Cog):
             userid = str(user.id)
             if userid in blocked:
                 del blocked[userid]
-                await ctx.maybe_send_embed("Unblocked <@{}> from sending messages to the bot.".format(userid))
+                await ctx.maybe_send_embed("Unblocked <@{}> sending messages to the bot.".format(userid))
             else:
                 await ctx.maybe_send_embed("This user is not blocked.")
 
