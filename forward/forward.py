@@ -2,12 +2,19 @@ from redbot.core import commands, checks, Config
 # from googletrans import Translator
 import discord
 import uuid
+from .converters import str_to_timedelta
+from datetime import datetime, timezone, timedelta
+import asyncio
+import logging
+
+from typing import Optional, Dict
 
 # trans = Translator()
 
+log = logging.getLogger("red.cogs.forward")
 
 class Forward(commands.Cog):
-    """Forward messages sent to the bot to the bot owner or in a specified channel."""
+    """Forward messages sent to the bot to the bot owner or a specified channel."""
 
     __version__ = "1.2.5"
 
@@ -26,6 +33,30 @@ class Forward(commands.Cog):
         self.config.register_global(**default_global)
 
         self.welcome = {}
+
+        self._unblock_task = asyncio.create_task(self._handle_automatic_unblock())
+
+    def cog_unload(self):
+        self._unblock_task.cancel()
+
+    async def _handle_automatic_unblock(self):
+        """This is the core task creator and loop
+        for automatic unblocks
+        """
+        await self.bot.wait_until_red_ready()
+        while True:
+            try:
+                await self._process_expired_blocks()
+            except Exception:
+                log.error("Error checking bot unblocks", exc_info=True)
+            await asyncio.sleep(60) # 60 seconds
+
+    async def _process_expired_blocks(self):
+        async with self.config.blocked() as blocked:
+            for userid in list(blocked.keys()):
+                until = blocked[userid]
+                if datetime.now(timezone.utc).timestamp() > until:
+                    del blocked[userid]
 
     async def _destination(self, msg: str = None, embed: discord.Embed = None):
         await self.bot.wait_until_ready()
@@ -240,28 +271,43 @@ class Forward(commands.Cog):
     @commands.command()
     @commands.guild_only()
     @checks.guildowner()
-    async def tblock(self, ctx, user: discord.Member):
-        """Blocks a member from sending dm
+    async def tblock(self, ctx, user: discord.Member, time: Optional[str] = "5d"):
+        """Blocks a member from sending DMs to the bot
         """
         async with self.config.blocked() as blocked:
             userid = str(user.id)
             if userid not in blocked:
-                blocked[userid] = True
-                await ctx.maybe_send_embed("Blocked <@{}> from send messages to the bot.".format(userid))
+                duration = str_to_timedelta(duration=time).get("duration")
+                duration = duration if type(duration) is timedelta else str_to_timedelta(duration="5d").get("duration")
+                blocked[userid] = (datetime.now(timezone.utc) + duration).timestamp() # until
+                await ctx.maybe_send_embed("Blocked <@{id}> from sending messages to the bot until <t:{until}>.".format(id=userid, until=int(blocked[userid])))
             else:
-                await ctx.maybe_send_embed("This user is already blocked.")
+                await ctx.maybe_send_embed("This user is already blocked until <t:{}>.".format(int(blocked[userid])))
 
     @commands.command()
     @commands.guild_only()
     @checks.guildowner()
     async def tunblock(self, ctx, user: discord.Member):
-        """Blocks a member from sending dm
+        """Unblocks a member from sending dms
         """
         async with self.config.blocked() as blocked:
             userid = str(user.id)
             if userid in blocked:
                 del blocked[userid]
-                await ctx.maybe_send_embed("Unblocked <@{}> from sending messages to the bot.".format(userid))
+                await ctx.maybe_send_embed("Unblocked <@{}> sending messages to the bot.".format(userid))
+            else:
+                await ctx.maybe_send_embed("This user is not blocked.")
+
+    @commands.command()
+    @commands.guild_only()
+    @checks.guildowner()
+    async def tcheckblock(self, ctx, user: discord.Member):
+        """Checks if a member is blocked from sending dms to the bot
+        """
+        async with self.config.blocked() as blocked:
+            userid = str(user.id)
+            if userid in blocked:
+                await ctx.maybe_send_embed("User <@{id}> is blocked until <t:{until}>.".format(id=userid, until=int(blocked[userid])))
             else:
                 await ctx.maybe_send_embed("This user is not blocked.")
 
