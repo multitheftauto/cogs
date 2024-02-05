@@ -280,9 +280,9 @@ class Forward(commands.Cog):
                 duration = str_to_timedelta(duration=time).get("duration")
                 duration = duration if type(duration) is timedelta else str_to_timedelta(duration="5d").get("duration")
                 blocked[userid] = (datetime.now(timezone.utc) + duration).timestamp() # until
-                await ctx.maybe_send_embed("Blocked <@{id}> from sending messages to the bot until {until}.".format(id=userid, until=datetime.fromtimestamp(blocked[userid])))
+                await ctx.maybe_send_embed("Blocked <@{id}> from sending messages to the bot until <t:{until}>.".format(id=userid, until=int(blocked[userid])))
             else:
-                await ctx.maybe_send_embed("This user is already blocked until {}.".format(datetime.fromtimestamp(blocked[userid])))
+                await ctx.maybe_send_embed("This user is already blocked until <t:{}>.".format(int(blocked[userid])))
 
     @commands.command()
     @commands.guild_only()
@@ -307,7 +307,7 @@ class Forward(commands.Cog):
         async with self.config.blocked() as blocked:
             userid = str(user.id)
             if userid in blocked:
-                await ctx.maybe_send_embed("User <@{id}> is blocked until {until}.".format(id=userid, until=datetime.fromtimestamp(blocked[userid])))
+                await ctx.maybe_send_embed("User <@{id}> is blocked until <t:{until}>.".format(id=userid, until=int(blocked[userid])))
             else:
                 await ctx.maybe_send_embed("This user is not blocked.")
 
