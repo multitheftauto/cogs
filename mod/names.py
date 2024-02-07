@@ -189,7 +189,7 @@ class ModInfo(MixinMeta):
         roles = member.roles[-1:0:-1]
         names, nicks = await self.get_names_and_nicks(member)
 
-        joined_at = joined_at.replace(tzinfo=datetime.timezone.utc)
+        joined_at = member.joined_at.replace(tzinfo=datetime.timezone.utc)
         user_created = int(member.created_at.replace(tzinfo=datetime.timezone.utc).timestamp())
         voice_state = member.voice
         member_number = (
