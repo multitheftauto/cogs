@@ -123,7 +123,7 @@ class spam(commands.Cog):
 
     @_list.command()
     async def textall(self, ctx):
-        """ Shows a list of blocked texts"""
+        """ Saves a list of blocked texts to file """
         strings = await self.config.guild(ctx.guild).strings()
         msg = ""
         for key in strings:
