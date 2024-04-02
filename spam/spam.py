@@ -130,8 +130,9 @@ class spam(commands.Cog):
             msg += "**{}** ({}) \n".format(key, strings[key])
         if not msg:
             await ctx.maybe_send_embed("List is empty.")
-        msg = "**Blocked Text:**\n"+msg
-        await menu(ctx, list(pagify(text=msg, page_length=999999999)), DEFAULT_CONTROLS)
+        with open("/data/cogs/CogManager/cogs/spam/blocked_text.txt", "w") as text_file:
+            text_file.write("%s" % msg)
+        await ctx.maybe_send_embed("List saved to file.")
 
     @_list.command()
     async def server(self, ctx):
