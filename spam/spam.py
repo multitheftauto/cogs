@@ -122,6 +122,18 @@ class spam(commands.Cog):
         await menu(ctx, list(pagify(msg)), DEFAULT_CONTROLS)
 
     @_list.command()
+    async def textall(self, ctx):
+        """ Shows a list of blocked texts"""
+        strings = await self.config.guild(ctx.guild).strings()
+        msg = ""
+        for key in strings:
+            msg += "**{}** ({}) \n".format(key, strings[key])
+        if not msg:
+            await ctx.maybe_send_embed("List is empty.")
+        msg = "**Blocked Text:**\n"+msg
+        await menu(ctx, list(pagify(text=msg, page_length=999999999)), DEFAULT_CONTROLS)
+
+    @_list.command()
     async def server(self, ctx):
         """ Shows a list of blocked servers """
         invites = await self.config.guild(ctx.guild).invites()
