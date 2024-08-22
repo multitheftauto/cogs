@@ -63,7 +63,8 @@ class Forward(commands.Cog):
         channel = await self.config.destination()
         channel = self.bot.get_channel(channel)
         if channel is None:
-            await self.bot.send_to_owners(msg, embed=embed)
+            log.info("DM forwarding is disabled")
+            #await self.bot.send_to_owners(msg, embed=embed)
         else:
             await channel.send(msg, embed=embed)
 
