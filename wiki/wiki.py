@@ -253,7 +253,7 @@ class wiki(commands.Cog):
         if ctx.channel.id not in channels:
             return
 
-        ticks = re.findall(r'\`(.*?)\`', ctx.content)
+        ticks = re.findall(r'\`\`([a-zA-Z]{2,}?)\`\`', ctx.content)
 
         while("" in ticks):
             ticks.remove("")
