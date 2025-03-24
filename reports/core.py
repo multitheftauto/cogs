@@ -281,6 +281,14 @@ class Reports(BASECOG):
             await self.config.guild(ctx.guild).emote_reactions.set(False)
             return await ctx.send("The setting is now disabled")
 
+    @reportset.command()
+    async def ping(self, ctx, category: discord.CategoryChannel, role: discord.Role):
+        """
+        Sets the role to be pinged when a report is sent in a category
+        """
+        await self.config.guild(ctx.guild).category_roles.set_raw(str(category.id), value=role.id)
+        await ctx.send(f"Done. Set {role.mention} to be pinged when a report is sent in {category.name}")
+        
     @commands.Cog.listener()
     async def on_message(self, message):
         """
