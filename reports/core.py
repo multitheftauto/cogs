@@ -289,6 +289,20 @@ class Reports(BASECOG):
         await self.config.guild(ctx.guild).category_roles.set_raw(str(category.id), value=role.id)
         await ctx.send(f"Done. Set {role.mention} to be pinged when a report is sent in {category.name}")
         
+    @reportset.command()
+    async def removeping(self, ctx, category: discord.CategoryChannel):
+        """
+        Removes the pinged role for a report in a specific category.
+        """
+        data = await self.config.guild(ctx.guild).category_roles.get_raw(str(category.id), default=None)
+        if data is None:
+            await ctx.send(f"No ping role is set for {category.name}.")
+            return
+
+        await self.config.guild(ctx.guild).category_roles.clear_raw(str(category.id))
+        await ctx.send(f"Removed the ping role for reports in {category.name}.")
+
+    
     @commands.Cog.listener()
     async def on_message(self, message):
         """
