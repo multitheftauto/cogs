@@ -11,6 +11,7 @@ DEF_GUILD = {
     "emote_reactions": False,
     "claim_reports": False,
     "recieve_dms": [],
+    "category_roles": {},
 }
 
 # TODO Add reportdm command to disable dms on reports. To avoid annoyed members.
@@ -142,8 +143,14 @@ class Reports(BASECOG):
         Sending to channel
         """
         channel_report = self.bot.get_channel(report_channel)
+        if ctx.channel.category:
+            role_id = await self.config.guild(ctx.guild).category_roles.get_raw(str(ctx.channel.category.id), default=None)
+            ping = ctx.guild.get_role(role_id) if role_id else None
+        else:
+            ping = None
+
         try:
-            await channel_report.send(embed=embed)
+            await channel_report.send(content=ping.mention if ping else None, embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
         except discord.Forbidden:
             self.log.warning("Unable to send message in {}".format(channel_report))
         except discord.HTTPException as e:
