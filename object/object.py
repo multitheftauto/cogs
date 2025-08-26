@@ -15,7 +15,7 @@ class Object(commands.Cog):
         self.image = "https://files.prineside.com/gtasa_samp_model_id/white/{}_w.jpg"
 
     @commands.command()
-    async def object(self, ctx, id: int):
+    async def object(self, ctx, id: str):
         """Get the object info"""
         # If not allowed channel return
         channels = await self.config.guild(ctx.guild).channels()
@@ -31,6 +31,11 @@ class Object(commands.Cog):
             else:
                 await ctx.send(f"{ctx.author.mention} This channel is not allowed to use the `object` command.")
             await ctx.message.delete()
+            return
+        try:
+            id = int(id)
+        except ValueError:
+            await ctx.send(f"{ctx.author.mention} Please provide a valid object ID (number).")
             return
         async with ctx.typing():
             # Get object info from webpage
