@@ -1,7 +1,8 @@
 import asyncio
 import datetime
 import logging
-from typing import Sequence, Union, cast, Optional, Tuple
+from typing import Sequence, Union, cast, Optional, Tuple, Pattern
+import re
 
 import discord
 from discord.ext.commands.converter import Converter
@@ -20,6 +21,9 @@ from redbot.core.utils.chat_formatting import (
 _ = Translator("ExtendedModLog", __file__)
 logger = logging.getLogger("red.trusty-cogs.ExtendedModLog")
 
+LINK_RE: Pattern = re.compile(
+    r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)", re.I
+)
 
 class CommandPrivs(Converter):
     """
@@ -380,8 +384,9 @@ class EventMixin:
                 channel=message_channel,
             )
         if embed_links:
+            filtered_content = LINK_RE.sub(r"\g<0>​", message.content) # make urls unclickable
             embed = discord.Embed(
-                description=f"{message.author.mention}: {message.content}",
+                description=f"{message.author.mention}: {filtered_content}",
                 colour=await self.get_event_colour(guild, "message_delete"),
                 timestamp=time,
             )
