@@ -12,6 +12,10 @@ INVITE_RE: Pattern = re.compile(
     r"(?:https?\:\/\/)?discord(?:\.gg|(?:app)?\.com\/invite)\/([a-zA-Z0-9]+)", re.I
 )
 
+LINK_RE: Pattern = re.compile(
+    r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)", re.I
+)
+
 
 class spam(commands.Cog):
     """ MTA:SA Spam Cog """
@@ -189,7 +193,7 @@ class spam(commands.Cog):
                 if feed:
                     embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Spam protection deleted an invite (Whitelist) in <#"+str(ctx.channel.id)+">")
                     embed.add_field(name="**Author:**", value="<@"+str(ctx.author.id)+">", inline=False)
-                    embed.add_field(name="**Message:**", value=ctx.content, inline=False)
+                    embed.add_field(name="**Message:**", value=LINK_RE.sub(r"\g<0>​", ctx.content), inline=False) # make urls unclickable
                     await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
                 return
 
@@ -201,7 +205,7 @@ class spam(commands.Cog):
                     if feed:
                         embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Spam protection deleted an invite (Blocked) in <#"+str(ctx.channel.id)+">")
                         embed.add_field(name="**Author:**", value="<@"+str(ctx.author.id)+">", inline=False)
-                        embed.add_field(name="**Message:**", value=ctx.content, inline=False)
+                        embed.add_field(name="**Message:**", value=LINK_RE.sub(r"\g<0>​", ctx.content), inline=False) # make urls unclickable
                         await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
                     return await ctx.delete()
 
@@ -212,7 +216,7 @@ class spam(commands.Cog):
                 if feed:
                     embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Spam protection deleted a message in <#"+str(ctx.channel.id)+">")
                     embed.add_field(name="**Author:**", value="<@"+str(ctx.author.id)+">", inline=False)
-                    embed.add_field(name="**Message:**", value=ctx.content, inline=False)
+                    embed.add_field(name="**Message:**", value=LINK_RE.sub(r"\g<0>​", ctx.content), inline=False) # make urls unclickable
                     await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
                 await ctx.delete()
                 return
