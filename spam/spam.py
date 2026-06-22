@@ -97,30 +97,30 @@ class spam(commands.Cog):
 
     @spam.group(name="file")
     async def file_group(self, ctx):
-        """ Add a file extension to block """
+        """ Add a file name to block """
         pass
 
     @file_group.command(name="add")
-    async def file_add(self, ctx, extension: str):
-        """ Add a file extension to block """
-        extension = extension.lower().replace(".", "")
+    async def file_add(self, ctx, substring: str):
+        """ Add a file name to block """
+        substring = substring.lower().strip()
         async with self.config.guild(ctx.guild).files() as files:
-            if extension not in files:
-                files.append(extension)
-                await ctx.maybe_send_embed(f"Added `{extension}` to blocked file extensions")
+            if substring not in files:
+                files.append(substring)
+                await ctx.maybe_send_embed(f"Added `{substring}` to blocked file names")
             else:
-                await ctx.maybe_send_embed(f"`{extension}` is already blocked")
+                await ctx.maybe_send_embed(f"`{substring}` is already blocked")
 
     @file_group.command(name="remove")
-    async def file_remove(self, ctx, extension: str):
-        """ Remove a file extension from block list """
-        extension = extension.lower().replace(".", "")
+    async def file_remove(self, ctx, substring: str):
+        """ Remove a file name from block list """
+        substring = substring.lower().strip()
         async with self.config.guild(ctx.guild).files() as files:
-            if extension in files:
-                files.remove(extension)
-                await ctx.maybe_send_embed(f"Removed `{extension}` from blocked file extensions")
+            if substring in files:
+                files.remove(substring)
+                await ctx.maybe_send_embed(f"Removed `{substring}` from blocked file names")
             else:
-                await ctx.maybe_send_embed(f"`{extension}` is not in the block list")
+                await ctx.maybe_send_embed(f"`{substring}` is not in the block list")
 
     @spam.command()
     async def remove(self, ctx, name):
@@ -188,12 +188,12 @@ class spam(commands.Cog):
 
     @_list.command()
     async def file(self, ctx):
-        """ Shows a list of blocked file extensions """
+        """ Shows a list of blocked file names """
         files = await self.config.guild(ctx.guild).files()
         if not files:
             await ctx.maybe_send_embed("List is empty.")
             return
-        msg = "**Blocked File Extensions:**\n" + "\n".join(f"- `{extension}`" for extension in files)
+        msg = "**Blocked File Names:**\n" + "\n".join(f"- `{substring}`" for substring in files)
         await menu(ctx, list(pagify(msg)), DEFAULT_CONTROLS)
 
     @checks.admin_or_permissions(manage_roles=True)
@@ -220,17 +220,18 @@ class spam(commands.Cog):
         if ctx.attachments:
             files = await self.config.guild(ctx.guild).files()
             for attachment in ctx.attachments:
-                file_extension = attachment.filename.split('.')[-1].lower()
-                if file_extension in files:
-                    await ctx.delete()
-                    feed = await self.config.guild(ctx.guild).feed()
-                    if feed:
-                        embed = discord.Embed(colour=discord.Colour(0xf5a623), description=f"Spam protection deleted a file with blocked extension `.{file_extension}` in <#{ctx.channel.id}>")
-                        embed.add_field(name="**Author:**", value=f"<@{ctx.author.id}>", inline=False)
-                        embed.add_field(name="**Message:**", value=ctx.content, inline=False)
-                        embed.add_field(name="**File:**", value=attachment.filename, inline=False)
-                        await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
-                    return
+                filename_lower = attachment.filename.lower()
+                for blocked in files:
+                    if blocked in filename_lower:
+                        await ctx.delete()
+                        feed = await self.config.guild(ctx.guild).feed()
+                        if feed:
+                            embed = discord.Embed(colour=discord.Colour(0xf5a623), description=f"Spam protection deleted a message with a blocked attachment (`{blocked}`) in <#{ctx.channel.id}>")
+                            embed.add_field(name="**Author:**", value=f"<@{ctx.author.id}>", inline=False)
+                            embed.add_field(name="**Message:**", value=ctx.content, inline=False)
+                            embed.add_field(name="**Attachment:**", value=attachment.filename, inline=False)
+                            await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
+                        return
 
         find = INVITE_RE.findall(ctx.clean_content)
         # print(find)
