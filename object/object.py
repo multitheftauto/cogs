@@ -9,17 +9,33 @@ class Object(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=707350954969792584)
-        default_guild = {"channels": []}
+        default_guild = {"channels": [], "bot_channel": None}
         self.config.register_guild(**default_guild)
         self.url = "https://dev.prineside.com/en/gtasa_samp_model_id/model/"
         self.image = "https://files.prineside.com/gtasa_samp_model_id/white/{}_w.jpg"
 
     @commands.command()
-    async def object(self, ctx, id: int):
+    async def object(self, ctx, id: str):
         """Get the object info"""
         # If not allowed channel return
         channels = await self.config.guild(ctx.guild).channels()
         if ctx.channel.id not in channels:
+            bot_channel_id = await self.config.guild(ctx.guild).bot_channel()
+            bot_channel_mention = None
+            if bot_channel_id:
+                bot_channel = ctx.guild.get_channel(bot_channel_id)
+                if bot_channel:
+                    bot_channel_mention = bot_channel.mention
+            if bot_channel_mention:
+                await ctx.send(f"{ctx.author.mention} This channel is not allowed to use the `object` command. Please use {bot_channel_mention} instead.")
+            else:
+                await ctx.send(f"{ctx.author.mention} This channel is not allowed to use the `object` command.")
+            await ctx.message.delete()
+            return
+        try:
+            id = int(id)
+        except ValueError:
+            await ctx.send(f"{ctx.author.mention} Please provide a valid object ID (number).")
             return
         async with ctx.typing():
             # Get object info from webpage
@@ -77,3 +93,8 @@ class Object(commands.Cog):
             channels.append(ctx.channel.id)
             await self.config.guild(ctx.guild).channels.set(channels)
             await ctx.channel.send("Object command is now allowed in this channel.")
+
+    @objectset.command(description="Set the bot channel to mention when command is used in disallowed channel")
+    async def botchannel(self, ctx, channel: discord.TextChannel):
+        await self.config.guild(ctx.guild).bot_channel.set(channel.id)
+        await ctx.send(f"Bot channel to mention set to {channel.mention}.")
