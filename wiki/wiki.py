@@ -198,7 +198,7 @@ class wiki(commands.Cog):
             
             embed = discord.Embed(title=target, colour=colour, url=self.url+target)
             embed.set_author(name=name, url=title_url)
-            embed.set_footer(text="@"+ctx.author.name+"#"+ctx.author.discriminator, icon_url=ctx.author.avatar_url)
+            embed.set_footer(text="@"+ctx.author.name+"#"+ctx.author.discriminator, icon_url=ctx.author.display_avatar.url)
 
             if part in ["description", "syntax", "example", "source", "parameters", "returns", "oArgs", "rArgs", "changelog", "seealso", "oop", "cancel"]:
                 part_name = part[0].upper() + part[1:]

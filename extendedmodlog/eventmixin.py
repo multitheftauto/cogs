@@ -260,7 +260,7 @@ class EventMixin:
             author_title = _("{member} ({m_id})- Used a Command").format(
                 member=message.author, m_id=message.author.id
             )
-            embed.set_author(name=author_title, icon_url=message.author.avatar_url)
+            embed.set_author(name=author_title, icon_url=message.author.display_avatar.url)
             await channel.send(embed=embed)
         else:
             await channel.send(infomessage[:2000])
@@ -401,7 +401,7 @@ class EventMixin:
                 embed.add_field(name=_("Attachments"), value=files)
             embed.set_author(
                 name=_("{member} ({m_id})- Deleted Message").format(member=author, m_id=author.id),
-                icon_url=str(message.author.avatar_url),
+                icon_url=str(message.author.display_avatar.url),
             )
             await channel.send(embed=embed)
         else:
@@ -619,12 +619,12 @@ class EventMixin:
                 name=_("{member} ({m_id}) has joined the guild").format(
                     member=member, m_id=member.id
                 ),
-                url=member.avatar_url,
-                icon_url=member.avatar_url,
+                url=member.display_avatar.url,
+                icon_url=member.display_avatar.url,
             )
             if possible_link:
                 embed.add_field(name=_("Invite Link"), value=possible_link)
-            embed.set_thumbnail(url=member.avatar_url)
+            embed.set_thumbnail(url=member.display_avatar.url)
             await channel.send(embed=embed)
         else:
             time = datetime.datetime.utcnow()
@@ -692,10 +692,10 @@ class EventMixin:
                 name=_("{member} ({m_id}) has left the guild").format(
                     member=member, m_id=member.id
                 ),
-                url=member.avatar_url,
-                icon_url=member.avatar_url,
+                url=member.display_avatar.url,
+                icon_url=member.display_avatar.url,
             )
-            embed.set_thumbnail(url=member.avatar_url)
+            embed.set_thumbnail(url=member.display_avatar.url)
             await channel.send(embed=embed)
         else:
             time = datetime.datetime.utcnow()
@@ -1287,7 +1287,7 @@ class EventMixin:
                 name=_("{member} ({m_id}) - Edited Message").format(
                     member=before.author, m_id=before.author.id
                 ),
-                icon_url=str(before.author.avatar_url),
+                icon_url=str(before.author.display_avatar.url),
             )
             await channel.send(embed=embed)
         else:
@@ -1665,7 +1665,7 @@ class EventMixin:
             m_id=before.id,
         )
         emb_msg = _("{member} ({m_id}) updated").format(member=before, m_id=before.id)
-        embed.set_author(name=emb_msg, icon_url=before.avatar_url)
+        embed.set_author(name=emb_msg, icon_url=before.display_avatar.url)
         member_updates = {"nick": _("Nickname:"), "roles": _("Roles:")}
         perp = None
         reason = None

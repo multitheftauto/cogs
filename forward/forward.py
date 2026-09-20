@@ -115,7 +115,7 @@ class Forward(commands.Cog):
             embeds = []
             embeds.append(discord.Embed(description=message.content))
             embeds[0].set_author(
-                name=f"{message.author} | {message.author.id}", icon_url=message.author.avatar_url
+                name=f"{message.author} | {message.author.id}", icon_url=message.author.display_avatar.url
             )
 
             if userid not in self.welcome:
@@ -220,7 +220,7 @@ class Forward(commands.Cog):
         em = discord.Embed(colour=discord.Colour.green(
         ), description="Message delivered to {}".format(user)+"\n**"+message+"**")
         em.set_footer(text="@"+ctx.author.name+"#"+ctx.author.discriminator +
-                      " | "+random_hash, icon_url=ctx.author.avatar_url)
+                      " | "+random_hash, icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=em)
         async with self.config.reply() as reply:
             reply[str(ctx.author.id)] = user.id
@@ -350,7 +350,7 @@ class Forward(commands.Cog):
         em = discord.Embed(colour=discord.Colour.green(
         ), description="Message delivered to {}".format(user)+"\n``"+message+"``")
         em.set_footer(text="@"+ctx.author.name+"#"+ctx.author.discriminator +
-                      " | "+random_hash, icon_url=ctx.author.avatar_url)
+                      " | "+random_hash, icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed=em)
 
     @commands.guild_only()
@@ -367,5 +367,5 @@ class Forward(commands.Cog):
             em = discord.Embed(colour=discord.Colour.green(
             ), description="Message delivered to <#{}".format(msg.channel.id)+">\n``"+message+"``\n[Goto]({})".format(msg.jump_url))
             em.set_footer(text="@"+ctx.author.name+"#"+ctx.author.discriminator +
-                          " | "+random_hash, icon_url=ctx.author.avatar_url)
+                          " | "+random_hash, icon_url=ctx.author.display_avatar.url)
             await channel.send(embed=em)
