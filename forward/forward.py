@@ -91,7 +91,8 @@ class Forward(commands.Cog):
     async def on_message_without_command(self, message):
         if message.guild is not None:
             return
-        if message.channel.recipient.id in self.bot.owner_ids:
+        recipient = getattr(message.channel, "recipient", None)
+        if recipient is not None and recipient.id in self.bot.owner_ids:
             return
         userid = str(message.author.id)
         async with self.config.blocked() as blocked:
