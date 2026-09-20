@@ -1,7 +1,7 @@
 from .botmention import BotMention
 
 
-def setup(bot):
+async def setup(bot):
     cog = BotMention(bot)
-    bot.add_cog(cog)
+    await bot.add_cog(cog)
     cog.init()

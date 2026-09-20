@@ -1,6 +1,6 @@
 from .helper import Helper
 
 
-def setup(bot):
+async def setup(bot):
     cog = Helper(bot)
-    bot.add_cog(cog)
+    await bot.add_cog(cog)

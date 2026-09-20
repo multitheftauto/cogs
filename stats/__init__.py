@@ -1,4 +1,4 @@
 from .stats import Stats
 
-def setup(bot):
-    bot.add_cog(Stats())
+async def setup(bot):
+    await bot.add_cog(Stats())

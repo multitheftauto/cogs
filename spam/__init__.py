@@ -1,5 +1,5 @@
 from .spam import spam
 
-def setup(bot):
+async def setup(bot):
     cog = spam(bot)
-    bot.add_cog(cog)
+    await bot.add_cog(cog)
