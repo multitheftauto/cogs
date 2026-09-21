@@ -1340,12 +1340,12 @@ class EventMixin:
             emoji=self.settings[guild.id]["guild_change"]["emoji"],
             time=time.strftime("%H:%M:%S"),
         )
+        # discord.py 2.0 removed Guild.region; voice regions are per-channel now
         guild_updates = {
             "name": _("Name:"),
-            "region": _("Region:"),
             "afk_timeout": _("AFK Timeout:"),
             "afk_channel": _("AFK Channel:"),
-            "icon_url": _("Server Icon:"),
+            "icon": _("Server Icon:"),
             "owner": _("Server Owner:"),
             "splash": _("Splash Image:"),
             "system_channel": _("Welcome message channel:"),
@@ -1357,9 +1357,10 @@ class EventMixin:
             after_attr = getattr(after, attr)
             if before_attr != after_attr:
                 worth_updating = True
-                if attr == "icon_url":
+                if attr == "icon":
                     embed.description = _("Server Icon Updated")
-                    embed.set_image(url=after.icon_url)
+                    if after.icon is not None:
+                        embed.set_image(url=str(after.icon.url))
                     continue
                 msg += _("Before ") + f"{name} {before_attr}\n"
                 msg += _("After ") + f"{name} {after_attr}\n"

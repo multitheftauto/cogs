@@ -21,9 +21,18 @@ MAX_FIELD_LENGTH = 1024
 
 def truncate_field(value: str) -> str:
     """Cap an embed field value to the length Discord accepts."""
-    if len(value) <= MAX_FIELD_LENGTH:
+    # Count UTF-16 units so surrogate pairs cannot exceed the limit
+    if len(value.encode("utf-16-le")) <= MAX_FIELD_LENGTH * 2:
         return value
-    return value[: MAX_FIELD_LENGTH - 3] + "..."
+    budget = MAX_FIELD_LENGTH - 3
+    length = 0
+    end = 0
+    for index, char in enumerate(value):
+        length += 2 if ord(char) > 0xFFFF else 1
+        if length > budget:
+            break
+        end = index + 1
+    return value[:end] + "..."
 
 
 class spam(commands.Cog):
@@ -211,7 +220,7 @@ class spam(commands.Cog):
 
     @checks.admin_or_permissions(manage_roles=True)
     @spam.command()
-    async def setfeed(self, ctx, channel_id):
+    async def setfeed(self, ctx, channel_id: int):
         """ Sets the feed channel for spam protection notifications """
         await self.config.guild(ctx.guild).feed.set(channel_id)
         await ctx.maybe_send_embed("The feed channel has been set to {}".format(channel_id))
@@ -246,7 +255,9 @@ class spam(commands.Cog):
                             embed.add_field(name="**Author:**", value=f"<@{ctx.author.id}>", inline=False)
                             embed.add_field(name="**Message:**", value=truncate_field(ctx.content), inline=False)
                             embed.add_field(name="**Attachment:**", value=truncate_field(attachment.filename), inline=False)
-                            await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
+                            feed_channel = self.bot.get_channel(int(feed))
+                            if feed_channel is not None:
+                                await feed_channel.send(embed=embed)
                         return
 
         find = INVITE_RE.findall(ctx.clean_content)
@@ -263,7 +274,9 @@ class spam(commands.Cog):
                     embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Spam protection deleted an invite (Whitelist) in <#"+str(ctx.channel.id)+">")
                     embed.add_field(name="**Author:**", value="<@"+str(ctx.author.id)+">", inline=False)
                     embed.add_field(name="**Message:**", value=truncate_field(LINK_RE.sub(r"\g<0>​", ctx.content)), inline=False) # make urls unclickable
-                    await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
+                    feed_channel = self.bot.get_channel(int(feed))
+                    if feed_channel is not None:
+                        await feed_channel.send(embed=embed)
                 return
 
             invites = await self.config.guild(ctx.guild).invites()
@@ -278,7 +291,9 @@ class spam(commands.Cog):
                         embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Spam protection deleted an invite (Blocked) in <#"+str(ctx.channel.id)+">")
                         embed.add_field(name="**Author:**", value="<@"+str(ctx.author.id)+">", inline=False)
                         embed.add_field(name="**Message:**", value=truncate_field(LINK_RE.sub(r"\g<0>​", ctx.content)), inline=False) # make urls unclickable
-                        await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
+                        feed_channel = self.bot.get_channel(int(feed))
+                        if feed_channel is not None:
+                            await feed_channel.send(embed=embed)
                     try:
                         return await ctx.delete()
                     except discord.NotFound:
@@ -292,7 +307,9 @@ class spam(commands.Cog):
                     embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Spam protection deleted a message in <#"+str(ctx.channel.id)+">")
                     embed.add_field(name="**Author:**", value="<@"+str(ctx.author.id)+">", inline=False)
                     embed.add_field(name="**Message:**", value=truncate_field(LINK_RE.sub(r"\g<0>​", ctx.content)), inline=False) # make urls unclickable
-                    await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
+                    feed_channel = self.bot.get_channel(int(feed))
+                    if feed_channel is not None:
+                        await feed_channel.send(embed=embed)
                 try:
                     await ctx.delete()
                 except discord.NotFound:
