@@ -108,7 +108,7 @@ class Dehoister(commands.Cog):
         if member.name.startswith(HOISTING_CHARACTERS):
             if guild.me.guild_permissions.manage_nicknames:
                 await member.edit(nick=member.display_name[1:].lstrip())
-                await self.create_case(guild, member, self.bot)
+                await self.create_case(guild, member, self.bot.user)
             else:
                 log.error(f"Invalid permissions to edit a members name. [{member.id}]")
 

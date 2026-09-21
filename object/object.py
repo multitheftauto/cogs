@@ -37,6 +37,8 @@ class Object(commands.Cog):
             soup = BeautifulSoup(data, "html.parser")
             # find the table by id "mp-model-info"
             table = soup.find("table", {"id": "mp-model-info"})
+            if table is None:
+                return await ctx.send("Object not found")
             # get first 8 rows
             rows = table.findAll("tr")[:8]
             # add embed
@@ -45,6 +47,9 @@ class Object(commands.Cog):
             for row in rows:
                 # find children td
                 cols = row.findAll("td")
+                # skip rows without label and value cells
+                if len(cols) < 2:
+                    continue
                 # get text
                 index = cols[0].text.strip()
                 # if next is input get value

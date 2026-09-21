@@ -16,6 +16,15 @@ LINK_RE: Pattern = re.compile(
     r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)", re.I
 )
 
+MAX_FIELD_LENGTH = 1024
+
+
+def truncate_field(value: str) -> str:
+    """Cap an embed field value to the length Discord accepts."""
+    if len(value) <= MAX_FIELD_LENGTH:
+        return value
+    return value[: MAX_FIELD_LENGTH - 3] + "..."
+
 
 class spam(commands.Cog):
     """ MTA:SA Spam Cog """
@@ -227,13 +236,16 @@ class spam(commands.Cog):
                 filename_lower = attachment.filename.lower()
                 for blocked in files:
                     if blocked in filename_lower:
-                        await ctx.delete()
+                        try:
+                            await ctx.delete()
+                        except discord.NotFound:
+                            pass
                         feed = await self.config.guild(ctx.guild).feed()
                         if feed:
                             embed = discord.Embed(colour=discord.Colour(0xf5a623), description=f"Spam protection deleted a message with a blocked attachment (`{blocked}`) in <#{ctx.channel.id}>")
                             embed.add_field(name="**Author:**", value=f"<@{ctx.author.id}>", inline=False)
-                            embed.add_field(name="**Message:**", value=ctx.content, inline=False)
-                            embed.add_field(name="**Attachment:**", value=attachment.filename, inline=False)
+                            embed.add_field(name="**Message:**", value=truncate_field(ctx.content), inline=False)
+                            embed.add_field(name="**Attachment:**", value=truncate_field(attachment.filename), inline=False)
                             await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
                         return
 
@@ -242,26 +254,35 @@ class spam(commands.Cog):
         if find:
             channels = await self.config.guild(ctx.guild).channels()
             if str(ctx.channel.id) not in channels:
-                await ctx.delete()
+                try:
+                    await ctx.delete()
+                except discord.NotFound:
+                    pass
                 feed = await self.config.guild(ctx.guild).feed()
                 if feed:
                     embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Spam protection deleted an invite (Whitelist) in <#"+str(ctx.channel.id)+">")
                     embed.add_field(name="**Author:**", value="<@"+str(ctx.author.id)+">", inline=False)
-                    embed.add_field(name="**Message:**", value=LINK_RE.sub(r"\g<0>​", ctx.content), inline=False) # make urls unclickable
+                    embed.add_field(name="**Message:**", value=truncate_field(LINK_RE.sub(r"\g<0>​", ctx.content)), inline=False) # make urls unclickable
                     await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
                 return
 
             invites = await self.config.guild(ctx.guild).invites()
             for i in find:
-                invite = await self.bot.fetch_invite(i)
+                try:
+                    invite = await self.bot.fetch_invite(i)
+                except discord.NotFound:
+                    continue
                 if str(invite.guild.id) in invites:
                     feed = await self.config.guild(ctx.guild).feed()
                     if feed:
                         embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Spam protection deleted an invite (Blocked) in <#"+str(ctx.channel.id)+">")
                         embed.add_field(name="**Author:**", value="<@"+str(ctx.author.id)+">", inline=False)
-                        embed.add_field(name="**Message:**", value=LINK_RE.sub(r"\g<0>​", ctx.content), inline=False) # make urls unclickable
+                        embed.add_field(name="**Message:**", value=truncate_field(LINK_RE.sub(r"\g<0>​", ctx.content)), inline=False) # make urls unclickable
                         await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
-                    return await ctx.delete()
+                    try:
+                        return await ctx.delete()
+                    except discord.NotFound:
+                        return
 
         strings = await self.config.guild(ctx.guild).strings()
         for key in strings:
@@ -270,9 +291,12 @@ class spam(commands.Cog):
                 if feed:
                     embed = discord.Embed(colour=discord.Colour(0xf5a623), description="Spam protection deleted a message in <#"+str(ctx.channel.id)+">")
                     embed.add_field(name="**Author:**", value="<@"+str(ctx.author.id)+">", inline=False)
-                    embed.add_field(name="**Message:**", value=LINK_RE.sub(r"\g<0>​", ctx.content), inline=False) # make urls unclickable
+                    embed.add_field(name="**Message:**", value=truncate_field(LINK_RE.sub(r"\g<0>​", ctx.content)), inline=False) # make urls unclickable
                     await self.bot.get_channel(int(await self.config.guild(ctx.guild).feed())).send(embed=embed)
-                await ctx.delete()
+                try:
+                    await ctx.delete()
+                except discord.NotFound:
+                    pass
                 return
 
     @commands.Cog.listener()

@@ -286,11 +286,14 @@ class EventMixin:
         channel_id = payload.channel_id
         if channel_id == 778610857931964456:
             return
+        message_channel = guild.get_channel(channel_id)
+        if message_channel is None:
+            return
         try:
             channel = await self.modlog_channel(guild, "message_delete")
         except RuntimeError:
             return
-        if await self.is_ignored_channel(guild, guild.get_channel(channel_id)):
+        if await self.is_ignored_channel(guild, message_channel):
             return
         embed_links = (
             channel.permissions_for(guild.me).embed_links
@@ -300,7 +303,6 @@ class EventMixin:
         if message is None:
             if settings["cached_only"]:
                 return
-            message_channel = guild.get_channel(channel_id)
             if embed_links:
                 embed = discord.Embed(
                     description=_("*Message's content unknown.*"),
@@ -426,6 +428,8 @@ class EventMixin:
             return
         channel_id = payload.channel_id
         message_channel = guild.get_channel(channel_id)
+        if message_channel is None:
+            return
         try:
             channel = await self.modlog_channel(guild, "message_delete")
         except RuntimeError:
@@ -442,7 +446,7 @@ class EventMixin:
                 description=message_channel.mention,
                 colour=await self.get_event_colour(guild, "message_delete"),
             )
-            embed.set_author(name=_("Bulk message delete"), icon_url=guild.icon_url)
+            embed.set_author(name=_("Bulk message delete"), icon_url=str(guild.icon.url) if guild.icon else None)
             embed.add_field(name=_("Channel"), value=message_channel.mention)
             embed.add_field(name=_("Messages deleted"), value=str(message_amount))
             await channel.send(embed=embed)
@@ -1327,8 +1331,11 @@ class EventMixin:
         embed = discord.Embed(
             timestamp=time, colour=await self.get_event_colour(guild, "guild_change")
         )
-        embed.set_author(name=_("Updated Guild"), icon_url=str(guild.icon_url))
-        embed.set_thumbnail(url=str(guild.icon_url))
+        if guild.icon:
+            embed.set_author(name=_("Updated Guild"), icon_url=str(guild.icon.url))
+            embed.set_thumbnail(url=str(guild.icon.url))
+        else:
+            embed.set_author(name=_("Updated Guild"))
         msg = _("{emoji} `{time}` Guild updated\n").format(
             emoji=self.settings[guild.id]["guild_change"]["emoji"],
             time=time.strftime("%H:%M:%S"),
