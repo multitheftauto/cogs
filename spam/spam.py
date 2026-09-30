@@ -102,7 +102,7 @@ class spam(commands.Cog):
             await ctx.maybe_send_embed("Couldn't resolve the invite.")
 
     @spam.command(name="channel")
-    async def _channel(self, ctx, channel: discord.TextChannel):
+    async def _channel(self, ctx, channel: discord.abc.GuildChannel):
         """ Add a channel to whitelist """
         if channel:
             channel_id = str(channel.id)
@@ -264,7 +264,12 @@ class spam(commands.Cog):
         # print(find)
         if find:
             channels = await self.config.guild(ctx.guild).channels()
-            if str(ctx.channel.id) not in channels:
+            channel_id = str(ctx.channel.id)
+
+            if isinstance(ctx.channel, discord.Thread) and ctx.channel.parent_id:
+                channel_id = str(ctx.channel.parent_id)
+
+            if channel_id not in channels:
                 try:
                     await ctx.delete()
                 except discord.NotFound:
