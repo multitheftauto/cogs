@@ -11,6 +11,7 @@ DEF_GUILD = {
     "emote_reactions": False,
     "claim_reports": False,
     "recieve_dms": [],
+    "category_roles": {},
 }
 
 # TODO Add reportdm command to disable dms on reports. To avoid annoyed members.
@@ -142,8 +143,14 @@ class Reports(BASECOG):
         Sending to channel
         """
         channel_report = self.bot.get_channel(report_channel)
+        if ctx.channel.category:
+            role_id = await self.config.guild(ctx.guild).category_roles.get_raw(str(ctx.channel.category.id), default=None)
+            ping = ctx.guild.get_role(role_id) if role_id else None
+        else:
+            ping = None
+
         try:
-            await channel_report.send(embed=embed)
+            await channel_report.send(content=ping.mention if ping else None, embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
         except discord.Forbidden:
             self.log.warning("Unable to send message in {}".format(channel_report))
         except discord.HTTPException as e:
@@ -281,6 +288,28 @@ class Reports(BASECOG):
             await self.config.guild(ctx.guild).emote_reactions.set(False)
             return await ctx.send("The setting is now disabled")
 
+    @reportset.command()
+    async def ping(self, ctx, category: discord.CategoryChannel, role: discord.Role):
+        """
+        Sets the role to be pinged when a report is sent in a category
+        """
+        await self.config.guild(ctx.guild).category_roles.set_raw(str(category.id), value=role.id)
+        await ctx.send(f"Done. Set {role.mention} to be pinged when a report is sent in {category.name}")
+        
+    @reportset.command()
+    async def removeping(self, ctx, category: discord.CategoryChannel):
+        """
+        Removes the pinged role for a report in a specific category.
+        """
+        data = await self.config.guild(ctx.guild).category_roles.get_raw(str(category.id), default=None)
+        if data is None:
+            await ctx.send(f"No ping role is set for {category.name}.")
+            return
+
+        await self.config.guild(ctx.guild).category_roles.clear_raw(str(category.id))
+        await ctx.send(f"Removed the ping role for reports in {category.name}.")
+
+    
     @commands.Cog.listener()
     async def on_message(self, message):
         """
