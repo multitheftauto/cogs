@@ -1,0 +1,11 @@
+{
+    "author": ["Cog Creators", "Deihim007"],
+    "install_msg": "",
+    "name": "mod",
+    "disabled": false,
+    "short": "",
+    "description": "MTA:SA fork of Red's core moderation cog: kick, ban, tempban, softban, voicekick, slowmode, name history, and the .modset banmessage/showid options.",
+    "tags": [],
+    "requirements": [],
+    "hidden": false
+}

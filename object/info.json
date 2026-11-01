@@ -1,0 +1,11 @@
+{
+    "author": ["Deihim007"],
+    "install_msg": "",
+    "name": "object",
+    "disabled": false,
+    "short": "",
+    "description": "Look up GTA: San Andreas / SA-MP object model IDs with an embed preview. Restricted to the channels allowed with objectset channel.",
+    "tags": [],
+    "requirements": ["aiohttp", "beautifulsoup4"],
+    "hidden": false
+}

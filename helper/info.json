@@ -1,0 +1,11 @@
+{
+    "author": ["Deihim007"],
+    "install_msg": "",
+    "name": "helper",
+    "disabled": false,
+    "short": "",
+    "description": "Helper-role utilities: lets the helper role issue a 1 hour mute-based timeout and logs it to a feed channel.",
+    "tags": [],
+    "requirements": [],
+    "hidden": false
+}
