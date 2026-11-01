@@ -3,9 +3,9 @@
     "install_msg": "",
     "name": "helper",
     "disabled": false,
-    "short": "",
-    "description": "Helper-role utilities: lets the helper role issue a 1 hour mute-based timeout and logs it to a feed channel.",
-    "tags": [],
+    "short": "Native member timeouts for the helper role",
+    "description": "Helper-role utilities: times members out with Discord's native timeout, optionally with a duration and reason, restricted to the helpers channel and logged to a feed channel.",
+    "tags": ["moderation", "timeout", "helper"],
     "requirements": [],
     "hidden": false
 }
